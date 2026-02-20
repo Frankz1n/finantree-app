@@ -1,0 +1,23 @@
+# Dependências
+node_modules/
+dist/
+build/
+
+# Variáveis de ambiente (MUITO IMPORTANTE: Impede o vazamento das chaves do Supabase)
+.env
+.env.local
+.env.development
+.env.production
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Arquivos do Sistema Operacional
+.DS_Store
+Thumbs.db
+
+# Configurações de IDEs (Opcional, mas recomendado)
+.vscode/
+.idea/
