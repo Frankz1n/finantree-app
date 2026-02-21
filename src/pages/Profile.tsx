@@ -7,6 +7,7 @@ import { Badges } from "@/components/gamification/Badges"
 export default function Profile() {
     const { user, streak } = useAuth()
     const [userLeague, setUserLeague] = useState('sprout')
+    const [userXP, setUserXP] = useState<number>(0)
 
     useEffect(() => {
         if (user) {
@@ -16,16 +17,33 @@ export default function Profile() {
 
     const fetchUserProfile = async () => {
         if (!user) return
-        const { data, error } = await supabase
-            .from('profiles')
-            .select('current_league')
-            .eq('id', user.id)
-            .single()
+        
+        try {
+            const { data: profileData, error: profileError } = await supabase
+                .from('profiles')
+                .select('current_league')
+                .eq('id', user.id)
+                .single()
 
-        if (!error && data) {
-            setUserLeague(data.current_league || 'sprout')
+            if (!profileError && profileData) {
+                setUserLeague(profileData.current_league || 'sprout')
+            }
+
+            const { data: xpData, error: xpError } = await supabase
+                .from('xp_transactions')
+                .select('amount')
+                .eq('user_id', user.id)
+
+            if (!xpError && xpData) {
+                const totalXP = xpData.reduce((acc, curr) => acc + (curr.amount || 0), 0)
+                setUserXP(totalXP)
+            }
+        } catch (error) {
+            console.error('Error fetching user profile data:', error)
         }
     }
+
+    const userLevel = Math.floor(userXP / 1000) + 1
 
     const memberSince = user?.created_at ? new Date(user.created_at).getFullYear() : new Date().getFullYear()
 
@@ -56,7 +74,9 @@ export default function Profile() {
                         <span className="bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider border border-emerald-200">
                             Liga {userLeague}
                         </span>
-                        {}
+                        <span className="bg-violet-100 text-violet-700 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider border border-violet-200">
+                            Nível {userLevel} ({userXP.toLocaleString()} XP)
+                        </span>
                     </div>
                 </div>
             </div>
