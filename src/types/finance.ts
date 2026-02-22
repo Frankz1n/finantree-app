@@ -98,6 +98,15 @@ export interface SavingBox {
     created_at: string
 }
 
+export interface SavingBoxTransaction {
+    id: string
+    saving_box_id: string
+    user_id: string
+    amount: number
+    type: 'deposit' | 'withdrawal'
+    created_at: string
+}
+
 export interface LeagueRanking {
     user_id: string
     full_name: string

@@ -5,6 +5,7 @@ import Dashboard from './pages/Dashboard'
 import Extract from './pages/Extract'
 import Profile from './pages/Profile'
 import Garden from './pages/Garden'
+import GoalDetails from './pages/GoalDetails'
 import Ranking from './pages/Ranking'
 import { ProtectedRoute } from './components/ProtectedRoute'
 import { useAuth } from './hooks/useAuth'
@@ -54,6 +55,7 @@ function App() {
                     <Route path="/dashboard" element={<Dashboard />} />
                     <Route path="/extract" element={<Extract />} />
                     <Route path="/garden" element={<Garden />} />
+                    <Route path="/jardim/:id" element={<GoalDetails />} />
                     <Route path="/ranking" element={<Ranking />} />
                     <Route path="/profile" element={<Profile />} />
                 </Route>
@@ -62,7 +64,7 @@ function App() {
             </Routes>
             <Toaster />
 
-            {}
+            { }
             {inviteData && (
                 <ConsentModal
                     isOpen={!!inviteData}
