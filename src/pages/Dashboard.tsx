@@ -10,6 +10,7 @@ import { TransparencyConsentModal } from "@/components/modals/TransparencyConsen
 import { TransactionModal } from "@/components/modals/TransactionModal"
 import { GoalModal } from "@/components/modals/GoalModal"
 import { StressTestButton } from "@/components/dev/StressTestButton"
+import { DashboardAnalytics } from "@/components/dashboard/DashboardAnalytics"
 
 export default function Dashboard() {
     const { user, streak, efficiencyScore } = useAuth()
@@ -91,15 +92,15 @@ export default function Dashboard() {
             </header>
 
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
-                {}
+                { }
                 <div className="lg:col-span-8 space-y-6 md:space-y-8">
 
-                    {}
+                    { }
                     <Card className="relative overflow-hidden rounded-[32px] md:rounded-[40px] border-none bg-white p-6 md:p-8 shadow-sm">
                         <div className="flex flex-col lg:flex-row items-center gap-6 lg:gap-8">
-                            {}
+                            { }
                             <div className="flex h-24 w-24 md:h-32 md:w-32 shrink-0 items-center justify-center rounded-full bg-green-50">
-                                {}
+                                { }
                                 <div className="text-5xl md:text-6xl">🌳</div>
                             </div>
 
@@ -121,7 +122,7 @@ export default function Dashboard() {
                         </div>
                     </Card>
 
-                    {}
+                    { }
                     <div>
                         <h3 className="mb-4 text-base md:text-lg font-bold text-slate-900">Ações Rápidas</h3>
                         <div className="grid grid-cols-2 sm:grid-cols-3 lg:flex lg:flex-wrap gap-3 md:gap-4">
@@ -158,10 +159,10 @@ export default function Dashboard() {
                     </div>
                 </div>
 
-                {}
+                { }
                 <div className="lg:col-span-4 space-y-6 md:space-y-8">
 
-                    {}
+                    { }
                     <div className="space-y-4">
                         <div className="flex items-center justify-between px-2">
                             <h3 className="text-base md:text-lg font-bold text-slate-900">Atividade Recente</h3>
@@ -192,12 +193,12 @@ export default function Dashboard() {
                         </Card>
                     </div>
 
-                    {}
+                    { }
                     <Card className="rounded-[32px] border-none bg-white p-6 md:p-8 shadow-sm text-center">
                         <h3 className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-6">Pontuação de Eficiência</h3>
 
                         <div className="relative mx-auto h-32 w-32 flex items-center justify-center">
-                            {}
+                            { }
                             <svg className="h-full w-full -rotate-90 transform" viewBox="0 0 100 100">
                                 <circle cx="50" cy="50" r="40" fill="transparent" stroke="#F1F5F9" strokeWidth="8" />
                                 <circle
@@ -218,6 +219,10 @@ export default function Dashboard() {
                     </Card>
 
                 </div>
+            </div>
+
+            <div className="mt-8 mb-4">
+                <DashboardAnalytics />
             </div>
 
             <TransparencyConsentModal
