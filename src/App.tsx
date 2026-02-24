@@ -13,6 +13,7 @@ import Invites from './pages/profile/Invites'
 import Garden from './pages/Garden'
 import GoalDetails from './pages/GoalDetails'
 import Ranking from './pages/Ranking'
+import PreSave from './pages/PreSave'
 import { ProtectedRoute } from './components/ProtectedRoute'
 import { useAuth } from './hooks/useAuth'
 import { Toaster } from 'sonner'
@@ -76,7 +77,7 @@ function App() {
                     <Route path="/profile/invites" element={<Invites />} />
                 </Route>
 
-                <Route path="/" element={<Navigate to={user ? "/dashboard" : "/login"} />} />
+                <Route path="/" element={<PreSave />} />
             </Routes>
             <Toaster />
 
