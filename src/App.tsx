@@ -4,6 +4,12 @@ import Register from './pages/Register'
 import Dashboard from './pages/Dashboard'
 import Extract from './pages/Extract'
 import Profile from './pages/Profile'
+import AccountDetails from './pages/profile/AccountDetails'
+import Security from './pages/profile/Security'
+import MyPlan from './pages/profile/MyPlan'
+import BillingHistory from './pages/profile/BillingHistory'
+import Achievements from './pages/profile/Achievements'
+import Invites from './pages/profile/Invites'
 import Garden from './pages/Garden'
 import GoalDetails from './pages/GoalDetails'
 import Ranking from './pages/Ranking'
@@ -58,6 +64,12 @@ function App() {
                     <Route path="/jardim/:id" element={<GoalDetails />} />
                     <Route path="/ranking" element={<Ranking />} />
                     <Route path="/profile" element={<Profile />} />
+                    <Route path="/profile/account" element={<AccountDetails />} />
+                    <Route path="/profile/security" element={<Security />} />
+                    <Route path="/profile/plan" element={<MyPlan />} />
+                    <Route path="/profile/billing" element={<BillingHistory />} />
+                    <Route path="/profile/achievements" element={<Achievements />} />
+                    <Route path="/profile/invites" element={<Invites />} />
                 </Route>
 
                 <Route path="/" element={<Navigate to={user ? "/dashboard" : "/login"} />} />
