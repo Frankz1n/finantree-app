@@ -1,11 +1,8 @@
 import { useNavigate } from "react-router-dom"
 import { ArrowLeft } from "lucide-react"
 import { Badges } from "@/components/gamification/Badges"
-import { useAuth } from "@/hooks/useAuth"
-
 export default function Achievements() {
     const navigate = useNavigate()
-    const { streak } = useAuth()
 
     return (
         <div className="space-y-6 pb-24 md:pb-8">
@@ -20,7 +17,7 @@ export default function Achievements() {
             </div>
 
             <div className="bg-white rounded-[32px] p-8 shadow-sm">
-                <Badges streak={streak || 0} score={0} />
+                <Badges />
             </div>
         </div>
     )
