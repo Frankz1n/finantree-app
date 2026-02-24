@@ -1,5 +1,5 @@
 
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { useAuth } from "@/hooks/useAuth"
 import { supabase } from "@/lib/supabase"
 import { Button } from "@/components/ui/button"
@@ -30,7 +30,7 @@ export function GardenOnboardingModal({ isOpen, onClose }: GardenOnboardingModal
             onClose()
         } catch (error) {
             console.error("Error updating onboarding status:", error)
-            onClose() 
+            onClose()
         } finally {
             setIsLoading(false)
         }

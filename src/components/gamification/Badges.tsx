@@ -1,10 +1,5 @@
 import { Trophy, Star, Shield, TrendingUp, Award, Zap, Target } from "lucide-react"
-import { useAchievements, Achievement } from "@/hooks/useAchievements"
-
-interface BadgesProps {
-    streak?: number;
-    score?: number;
-}
+import { useAchievements } from "@/hooks/useAchievements"
 
 const iconMap: Record<string, React.ElementType> = {
     'star': Star,
@@ -16,7 +11,7 @@ const iconMap: Record<string, React.ElementType> = {
     'target': Target
 }
 
-export function Badges({ streak, score }: BadgesProps) {
+export function Badges() {
     const { achievements, userAchievements, loading } = useAchievements()
 
     if (loading) {
@@ -39,8 +34,8 @@ export function Badges({ streak, score }: BadgesProps) {
                         <div
                             key={badge.id}
                             className={`flex min-w-[160px] flex-col items-center justify-center p-4 rounded-[24px] border transition-all ${isUnlocked
-                                    ? 'bg-white border-slate-100 shadow-sm opacity-100'
-                                    : 'bg-slate-50 border-slate-100 opacity-50 grayscale'
+                                ? 'bg-white border-slate-100 shadow-sm opacity-100'
+                                : 'bg-slate-50 border-slate-100 opacity-50 grayscale'
                                 }`}
                         >
                             <div className={`mb-3 flex h-12 w-12 items-center justify-center rounded-full ${isUnlocked ? 'bg-yellow-100 text-yellow-600' : 'bg-slate-200 text-slate-400'}`}>
