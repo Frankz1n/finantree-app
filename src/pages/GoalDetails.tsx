@@ -5,7 +5,8 @@ import { SavingBoxService } from '@/services/savingBoxes';
 import { SavingBox, SavingBoxTransaction } from '@/types/finance';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { ArrowLeft, Loader2, Plus, Minus, Target } from 'lucide-react';
+import { Skeleton } from '@/components/ui/skeleton';
+import { ArrowLeft, Plus, Minus, Target } from 'lucide-react';
 import { formatCurrency, cn } from '@/lib/utils';
 import { format, parseISO, eachDayOfInterval } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
@@ -132,9 +133,28 @@ export default function GoalDetails() {
 
     if (isLoading || !box) {
         return (
-            <div className="flex h-full min-h-[400px] flex-col items-center justify-center text-slate-400 gap-4">
-                <Loader2 size={32} className="animate-spin text-slate-300" />
-                <span className="text-sm font-bold uppercase tracking-wider">Carregando detalhes da meta...</span>
+            <div className="space-y-6 md:space-y-8 pb-24 md:pb-8 max-w-5xl mx-auto px-6 pt-6 animate-pulse">
+                <div className="flex flex-col md:flex-row justify-between gap-6">
+                    <div className="flex items-center gap-4">
+                        <Skeleton className="h-12 w-12 rounded-full" />
+                        <div className="flex items-center gap-4">
+                            <Skeleton className="h-14 w-14 rounded-full" />
+                            <div className="space-y-2">
+                                <Skeleton className="h-8 w-48" />
+                                <Skeleton className="h-4 w-32" />
+                            </div>
+                        </div>
+                    </div>
+                    <Skeleton className="h-24 w-full md:w-64 rounded-2xl" />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                    <Skeleton className="h-24 rounded-3xl" />
+                    <Skeleton className="h-24 rounded-3xl" />
+                </div>
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
+                    <Skeleton className="lg:col-span-8 h-[400px] rounded-[32px]" />
+                    <Skeleton className="lg:col-span-4 h-[400px] rounded-[32px]" />
+                </div>
             </div>
         );
     }

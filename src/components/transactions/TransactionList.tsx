@@ -50,7 +50,7 @@ const TransactionList = ({ transactions, onEdit, onDelete }: TransactionListProp
                         {items.map((t) => (
                             <div key={t.id} className="group flex items-center gap-4 relative">
                                 <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-full ${getCategoryColor(t.type)}`}>
-                                    {}
+                                    { }
                                     <span className="text-xl">{t.categories?.icon || '📄'}</span>
                                 </div>
                                 <div className="flex-1 min-w-0">
@@ -65,20 +65,20 @@ const TransactionList = ({ transactions, onEdit, onDelete }: TransactionListProp
                                         </p>
                                     </div>
                                 </div>
-                                <div className="flex items-center gap-3">
-                                    <div className={`text-sm font-bold ${t.type === 'income' ? 'text-[#00C980]' : 'text-slate-900'}`}>
+                                <div className="flex flex-col items-end shrink-0 ml-2 gap-1.5">
+                                    <div className={`text-sm font-bold whitespace-nowrap ${t.type === 'income' ? 'text-emerald-500' : 'text-slate-900'}`}>
                                         {t.type === 'expense' ? '-' : '+'}{formatCurrency(t.amount)}
                                     </div>
 
                                     {(onEdit || onDelete) && (
-                                        <div className="flex items-center gap-1 opacity-10 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-200">
+                                        <div className="flex items-center gap-1 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-200">
                                             {onEdit && (
                                                 <button
                                                     onClick={() => onEdit(t)}
                                                     className="p-1.5 text-slate-400 hover:text-indigo-500 hover:bg-indigo-50 rounded-md transition-colors"
                                                     title="Editar"
                                                 >
-                                                    <Pencil size={15} />
+                                                    <Pencil size={14} />
                                                 </button>
                                             )}
                                             {onDelete && (
@@ -87,7 +87,7 @@ const TransactionList = ({ transactions, onEdit, onDelete }: TransactionListProp
                                                     className="p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-md transition-colors"
                                                     title="Excluir"
                                                 >
-                                                    <Trash2 size={15} />
+                                                    <Trash2 size={14} />
                                                 </button>
                                             )}
                                         </div>

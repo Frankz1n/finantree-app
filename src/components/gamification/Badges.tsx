@@ -1,5 +1,6 @@
 import { Trophy, Star, Shield, TrendingUp, Award, Zap, Target } from "lucide-react"
 import { useAchievements } from "@/hooks/useAchievements"
+import { Skeleton } from "@/components/ui/skeleton"
 
 const iconMap: Record<string, React.ElementType> = {
     'star': Star,
@@ -15,7 +16,19 @@ export function Badges() {
     const { achievements, userAchievements, loading } = useAchievements()
 
     if (loading) {
-        return <div className="text-slate-400 text-sm">Carregando conquistas...</div>
+        return (
+            <div className="space-y-4">
+                <div className="flex items-center gap-2 mb-2">
+                    <Skeleton className="h-6 w-6 rounded-full" />
+                    <Skeleton className="h-6 w-32" />
+                </div>
+                <div className="flex gap-4 overflow-x-hidden pb-4">
+                    {[1, 2, 3].map(i => (
+                        <Skeleton key={i} className="h-[140px] min-w-[160px] rounded-[24px]" />
+                    ))}
+                </div>
+            </div>
+        )
     }
 
     return (

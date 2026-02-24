@@ -45,8 +45,12 @@ function App() {
 
     if (loading) {
         return (
-            <div className="flex h-screen items-center justify-center bg-black text-emerald-500 font-mono">
-                <p className="animate-pulse">_carregando_sistema...</p>
+            <div className="flex h-screen items-center justify-center bg-emerald-500">
+                <div className="flex flex-col items-center gap-4 animate-pulse">
+                    <div className="h-16 w-16 bg-white rounded-2xl flex items-center justify-center shadow-xl">
+                        <img src="/icon.svg" alt="Finantree Logo" className="h-10 w-10 object-contain" />
+                    </div>
+                </div>
             </div>
         )
     }

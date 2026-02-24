@@ -50,8 +50,8 @@ export function Sidebar() {
         <aside className="hidden fixed left-0 top-0 z-40 h-screen w-64 flex-col border-r border-slate-100 bg-white px-6 py-8 md:flex">
             {/* Logo */}
             <div className="mb-10 flex items-center gap-3 px-2">
-                <div className="flex h-10 w-10 items-center justify-center rounded-[14px] bg-gradient-to-br from-emerald-400 to-emerald-600 shadow-lg shadow-emerald-500/20">
-                    <Sprout size={20} className="text-white" />
+                <div className="flex h-10 w-10 items-center justify-center rounded-[14px] bg-gradient-to-br from-emerald-400 to-emerald-600 shadow-lg shadow-emerald-500/20 overflow-hidden">
+                    <img src="/icon.svg" alt="Finantree Logo" className="h-6 w-6 object-contain" />
                 </div>
                 <span className="text-xl font-bold text-slate-900">Finantree</span>
             </div>

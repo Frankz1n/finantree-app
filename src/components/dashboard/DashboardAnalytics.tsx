@@ -7,9 +7,10 @@ import {
     AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer,
     PieChart, Pie, Cell, Legend
 } from 'recharts';
-import { Loader2 } from 'lucide-react';
+
 import { formatCurrency, cn } from '@/lib/utils';
 import { subDays, subMonths, subYears, startOfMonth, endOfMonth, format, eachDayOfInterval } from 'date-fns';
+import { Skeleton } from '@/components/ui/skeleton';
 import { ptBR } from 'date-fns/locale';
 import { supabase } from '@/lib/supabase';
 
@@ -256,10 +257,7 @@ export function DashboardAnalytics() {
                 {/* ALTURA FIXA AQUI h-[320px] PARA O GRÁFICO DE FLUXO */}
                 <div className="w-full h-[320px] mt-4">
                     {isLoading ? (
-                        <div className="w-full h-full flex flex-col items-center justify-center text-slate-400 gap-3">
-                            <Loader2 size={32} className="animate-spin text-slate-300" />
-                            <span className="text-xs font-bold uppercase tracking-wider">Carregando dados...</span>
-                        </div>
+                        <Skeleton className="w-full h-full rounded-2xl" />
                     ) : areaChartData.length === 0 ? (
                         <div className="w-full h-full flex flex-col items-center justify-center text-slate-400 gap-3">
                             <div className="text-3xl">📉</div>
@@ -326,9 +324,7 @@ export function DashboardAnalytics() {
                     {/* ALTURA FIXA AQUI h-[300px] PARA OS DONUTS */}
                     <div className="w-full flex items-center justify-center h-[300px]">
                         {isLoading ? (
-                            <div className="flex flex-col items-center justify-center text-slate-400 gap-3">
-                                <Loader2 size={32} className="animate-spin text-slate-300" />
-                            </div>
+                            <Skeleton className="w-48 h-48 rounded-full" />
                         ) : incomePieData.length === 0 ? (
                             <div className="flex flex-col items-center justify-center text-slate-400 gap-3 text-center">
                                 <div className="h-16 w-16 rounded-full bg-slate-50 flex items-center justify-center text-2xl">
@@ -377,9 +373,7 @@ export function DashboardAnalytics() {
                     {/* ALTURA FIXA AQUI h-[300px] PARA OS DONUTS */}
                     <div className="w-full flex items-center justify-center h-[300px]">
                         {isLoading ? (
-                            <div className="flex flex-col items-center justify-center text-slate-400 gap-3">
-                                <Loader2 size={32} className="animate-spin text-slate-300" />
-                            </div>
+                            <Skeleton className="w-48 h-48 rounded-full" />
                         ) : expensePieData.length === 0 ? (
                             <div className="flex flex-col items-center justify-center text-slate-400 gap-3 text-center">
                                 <div className="h-16 w-16 rounded-full bg-slate-50 flex items-center justify-center text-2xl">

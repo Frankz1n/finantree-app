@@ -4,6 +4,7 @@ import { Sprout, Leaf, TreeDeciduous, TreePine, PawPrint, Trophy, ArrowUp, Arrow
 import { cn } from "@/lib/utils"
 import { supabase } from "@/lib/supabase"
 import { RankingOnboardingModal } from "@/components/modals/RankingOnboardingModal"
+import { Skeleton } from "@/components/ui/skeleton"
 import { LeagueRanking } from "@/types/finance"
 
 
@@ -27,8 +28,8 @@ const LEAGUES = [
 
 export default function Ranking() {
     const { user } = useAuth()
-    const [currentLeague, setCurrentLeague] = useState('sprout') 
-    const [userLeague, setUserLeague] = useState<string>('sprout') 
+    const [currentLeague, setCurrentLeague] = useState('sprout')
+    const [userLeague, setUserLeague] = useState<string>('sprout')
     const [userXP, setUserXP] = useState<number>(0)
     const [rankingList, setRankingList] = useState<LeagueRanking[]>([])
     const [loading, setLoading] = useState(true)
@@ -109,7 +110,7 @@ export default function Ranking() {
     const isLocked = currentLeague !== userLeague
 
     return (
-        <div className="space-y-6 pb-40"> {}
+        <div className="space-y-6 pb-40"> { }
             <header className="space-y-2">
                 <h1 className="text-3xl font-bold text-slate-900">Ranking</h1>
                 <p className="text-slate-500 font-medium">
@@ -117,7 +118,7 @@ export default function Ranking() {
                 </p>
             </header>
 
-            {}
+            { }
             <div className="flex overflow-x-auto gap-2 pb-2 scrollbar-hide">
                 {LEAGUES.map((league) => {
                     const Icon = league.icon
@@ -150,7 +151,7 @@ export default function Ranking() {
                 })}
             </div>
 
-            {}
+            { }
             {currentLeague === 'fauna' && (
                 <div className="rounded-2xl bg-gradient-to-r from-amber-200 to-yellow-400 p-6 shadow-lg shadow-amber-200/50 flex items-center gap-4 animate-in fade-in slide-in-from-top-4">
                     <div className="h-12 w-12 bg-white/30 rounded-full flex items-center justify-center backdrop-blur-sm">
@@ -165,12 +166,30 @@ export default function Ranking() {
                 </div>
             )}
 
-            {}
+            { }
             <div className="bg-white rounded-[32px] shadow-sm overflow-hidden min-h-[400px]">
                 {loading ? (
-                    <div className="flex flex-col items-center justify-center h-[400px] text-center space-y-4">
-                        <div className="animate-spin h-8 w-8 border-4 border-emerald-500 border-t-transparent rounded-full" />
-                        <p className="text-slate-400">Carregando ranking...</p>
+                    <div className="p-6 space-y-4">
+                        <div className="flex items-center justify-between border-b border-slate-100 pb-4">
+                            <Skeleton className="h-6 w-32" />
+                            <Skeleton className="h-4 w-24" />
+                        </div>
+                        {[1, 2, 3, 4, 5].map((i) => (
+                            <div key={i} className="flex items-center justify-between p-2">
+                                <div className="flex items-center gap-4">
+                                    <Skeleton className="h-6 w-6" />
+                                    <Skeleton className="h-10 w-10 rounded-full" />
+                                    <div className="space-y-2">
+                                        <Skeleton className="h-4 w-32" />
+                                        <Skeleton className="h-3 w-20" />
+                                    </div>
+                                </div>
+                                <div className="flex items-center gap-6">
+                                    <Skeleton className="h-4 w-16" />
+                                    <Skeleton className="h-4 w-4" />
+                                </div>
+                            </div>
+                        ))}
                     </div>
                 ) : isLocked ? (
                     <div className="flex flex-col items-center justify-center h-[400px] text-center p-8 space-y-6">
@@ -281,7 +300,7 @@ export default function Ranking() {
                 )}
             </div>
 
-            {}
+            { }
             {user && !isLocked && !loading && (
                 <div className="fixed bottom-0 md:left-64 left-0 right-0 z-20 bg-white border-t border-slate-100 shadow-[0_-4px_20px_-5px_rgba(0,0,0,0.1)] p-4 px-6 animate-in slide-in-from-bottom-full">
                     <div className="max-w-7xl mx-auto flex items-center justify-between">
