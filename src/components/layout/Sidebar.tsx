@@ -1,4 +1,4 @@
-import { Home, Wallet, Sparkles, Sprout, Trophy, User, LogOut, TreeDeciduous } from "lucide-react"
+import { Home, Wallet, Sparkles, Sprout, Trophy, User, LogOut } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useAuth } from "@/hooks/useAuth"
 import { useNavigate, useLocation } from "react-router-dom"
@@ -48,15 +48,15 @@ export function Sidebar() {
 
     return (
         <aside className="hidden fixed left-0 top-0 z-40 h-screen w-64 flex-col border-r border-slate-100 bg-white px-6 py-8 md:flex">
-            {}
+            {/* Logo */}
             <div className="mb-10 flex items-center gap-3 px-2">
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#00C980] text-white shadow-lg shadow-emerald-200/50">
-                    <TreeDeciduous size={20} strokeWidth={2.5} />
+                <div className="flex h-10 w-10 items-center justify-center rounded-[14px] bg-gradient-to-br from-emerald-400 to-emerald-600 shadow-lg shadow-emerald-500/20">
+                    <Sprout size={20} className="text-white" />
                 </div>
                 <span className="text-xl font-bold text-slate-900">Finantree</span>
             </div>
 
-            {}
+            { }
             <nav className="flex-1 space-y-2">
                 {menuItems.map((item) => (
                     <SidebarItem
@@ -69,7 +69,7 @@ export function Sidebar() {
                 ))}
             </nav>
 
-            {}
+            { }
             <div className="mt-auto mb-6">
                 <div className="relative overflow-hidden rounded-2xl bg-[#F5F3FF] p-5">
                     <div className="absolute -right-2 -top-2 h-16 w-16 rounded-full bg-[#EBE5FF] blur-xl" />
@@ -82,7 +82,7 @@ export function Sidebar() {
                 </div>
             </div>
 
-            {}
+            { }
             <div className="border-t border-slate-100 pt-4">
                 <button
                     onClick={handleLogout}

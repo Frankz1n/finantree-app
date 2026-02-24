@@ -2,7 +2,7 @@ import { useState } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
-import { Eye, EyeOff, TreeDeciduous, Mail, Lock, ArrowRight } from "lucide-react"
+import { Eye, EyeOff, Sprout, Mail, Lock, ArrowRight } from "lucide-react"
 import { useNavigate } from "react-router-dom"
 
 import { Button } from "@/components/ui/button"
@@ -56,10 +56,10 @@ export default function Login() {
     return (
         <div className="flex min-h-screen items-center justify-center bg-[#F8FAFC] px-4 font-sans text-slate-900">
             <div className="w-full max-w-[420px] space-y-8">
-                {}
+                { }
                 <div className="flex flex-col items-center space-y-4 text-center">
-                    <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-[#00C980] text-white shadow-lg shadow-emerald-200/50">
-                        <TreeDeciduous size={32} strokeWidth={2.5} />
+                    <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-400 to-emerald-600 shadow-lg shadow-emerald-500/20">
+                        <Sprout className="text-white" size={32} />
                     </div>
                     <div className="space-y-1">
                         <h1 className="text-3xl font-bold tracking-tight text-slate-900">Finantree</h1>
@@ -67,7 +67,7 @@ export default function Login() {
                     </div>
                 </div>
 
-                {}
+                { }
                 <Card className="border-none shadow-xl shadow-slate-200/60 rounded-[45px] bg-white overflow-hidden">
                     <CardContent className="p-8 sm:p-10">
                         <Button
@@ -76,7 +76,7 @@ export default function Login() {
                             onClick={handleGoogleLogin}
                         >
                             <div className="absolute left-6">
-                                {}
+                                { }
                                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
                                     <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" />
@@ -164,7 +164,7 @@ export default function Login() {
                     </CardContent>
                 </Card>
 
-                {}
+                { }
                 <div className="text-center space-y-6">
                     <p className="text-sm text-slate-500 font-medium">
                         ¿Novo por aqui?{" "}
