@@ -82,7 +82,7 @@ export function RankingOnboardingModal({ isOpen, onClose }: RankingOnboardingMod
                         <div className="text-left">
                             <h4 className="font-bold text-slate-900 text-sm">3. As Regras de Ouro</h4>
                             <p className="text-xs text-slate-500 leading-relaxed mt-1">
-                                Para validar sua participação, tenha uma ofensiva maior que 20 dias, siga o <span className="font-bold text-purple-600">@finantree.plataforma</span>, poste um story marcando o Finantree e lembre-se de deixar o perfil público para verificação da equipe.
+                                Para validar sua participação, tenha uma ofensiva maior que 20 dias, siga o <span className="font-bold text-purple-600">@finantreeapp</span>, poste um story marcando o Finantree e lembre-se de deixar o perfil público para verificação da equipe.
                             </p>
                         </div>
                     </div>

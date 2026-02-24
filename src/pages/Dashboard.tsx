@@ -9,7 +9,6 @@ import { Transaction } from "@/types/finance"
 import { TransparencyConsentModal } from "@/components/modals/TransparencyConsentModal"
 import { TransactionModal } from "@/components/modals/TransactionModal"
 import { GoalModal } from "@/components/modals/GoalModal"
-import { StressTestButton } from "@/components/dev/StressTestButton"
 import { DashboardAnalytics } from "@/components/dashboard/DashboardAnalytics"
 
 export default function Dashboard() {
@@ -246,7 +245,6 @@ export default function Dashboard() {
                 onSuccess={refreshData}
             />
 
-            <StressTestButton />
         </>
     )
 }
