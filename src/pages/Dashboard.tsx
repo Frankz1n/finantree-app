@@ -38,6 +38,13 @@ export default function Dashboard() {
 
     useEffect(() => {
         refreshData()
+
+        const handleTransactionUpdate = () => refreshData()
+        window.addEventListener('transaction_updated', handleTransactionUpdate)
+
+        return () => {
+            window.removeEventListener('transaction_updated', handleTransactionUpdate)
+        }
     }, [refreshData])
 
     const openTransactionModal = (type: 'income' | 'expense') => {
