@@ -13,6 +13,7 @@ import { subDays, subMonths, subYears, startOfMonth, endOfMonth, format, eachDay
 import { Skeleton } from '@/components/ui/skeleton';
 import { ptBR } from 'date-fns/locale';
 import { supabase } from '@/lib/supabase';
+import { DashboardSubscriptionsChart } from './DashboardSubscriptionsChart';
 
 type TimeFilter = '24h' | '7d' | '1m' | '3m' | '6m' | '1y';
 
@@ -323,7 +324,7 @@ export function DashboardAnalytics() {
             </Card>
 
             {/* Grid for Pie Charts */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
                 {/* Donut Chart - Incomes by Category */}
                 <Card className="rounded-[32px] border-none bg-white p-6 shadow-sm flex flex-col">
                     <h3 className="text-base md:text-lg font-bold text-slate-900 mb-6 px-2 text-center lg:text-left">Receitas por Categoria</h3>
@@ -421,6 +422,9 @@ export function DashboardAnalytics() {
                         )}
                     </div>
                 </Card>
+
+                {/* Donut Chart - Subscriptions */}
+                <DashboardSubscriptionsChart />
             </div>
         </div>
     );

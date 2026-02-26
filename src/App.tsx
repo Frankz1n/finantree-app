@@ -14,6 +14,7 @@ import Garden from './pages/Garden'
 import GoalDetails from './pages/GoalDetails'
 import Ranking from './pages/Ranking'
 import PreSave from './pages/PreSave'
+import Subscriptions from './pages/Subscriptions'
 import { ProtectedRoute } from './components/ProtectedRoute'
 import { useAuth } from './hooks/useAuth'
 import { Toaster } from 'sonner'
@@ -65,6 +66,7 @@ function App() {
                 <Route element={<ProtectedRoute />}>
                     <Route path="/dashboard" element={<Dashboard />} />
                     <Route path="/extract" element={<Extract />} />
+                    <Route path="/assinaturas" element={<Subscriptions />} />
                     <Route path="/garden" element={<Garden />} />
                     <Route path="/jardim/:id" element={<GoalDetails />} />
                     <Route path="/ranking" element={<Ranking />} />
