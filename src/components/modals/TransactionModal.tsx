@@ -108,6 +108,7 @@ export function TransactionModal({ isOpen, type, onClose, onSuccess, initialData
                 toast.success(isIncome ? "Receita adicionada com sucesso!" : "Despesa adicionada com sucesso!")
             }
 
+            window.dispatchEvent(new CustomEvent('transaction_updated'))
             onSuccess()
             onClose()
         } catch {
@@ -123,13 +124,13 @@ export function TransactionModal({ isOpen, type, onClose, onSuccess, initialData
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4 backdrop-blur-sm">
             <div className="relative w-full max-w-md overflow-hidden rounded-[32px] bg-white shadow-2xl animate-in fade-in zoom-in-95 duration-200">
 
-                {}
+                { }
                 <div className={cn(
                     "h-1.5 w-full",
                     isIncome ? "bg-emerald-500" : "bg-red-500"
                 )} />
 
-                {}
+                { }
                 <div className="flex items-center justify-between p-6 pb-2">
                     <h2 className={cn(
                         "text-xl font-bold",
@@ -146,7 +147,7 @@ export function TransactionModal({ isOpen, type, onClose, onSuccess, initialData
                 </div>
 
                 <div className="p-6 pt-2 space-y-6">
-                    {}
+                    { }
                     <div>
                         <label className="text-xs font-bold uppercase tracking-wider text-slate-400 ml-2">Valor</label>
                         <div className="mt-2">
@@ -159,7 +160,7 @@ export function TransactionModal({ isOpen, type, onClose, onSuccess, initialData
                         </div>
                     </div>
 
-                    {}
+                    { }
                     <div>
                         <label className="text-xs font-bold uppercase tracking-wider text-slate-400 ml-2">Descrição</label>
                         <input
@@ -171,7 +172,7 @@ export function TransactionModal({ isOpen, type, onClose, onSuccess, initialData
                         />
                     </div>
 
-                    {}
+                    { }
                     <div>
                         <label className="text-xs font-bold uppercase tracking-wider text-slate-400 ml-2">Categoria</label>
                         {isLoadingCats ? (
@@ -213,7 +214,7 @@ export function TransactionModal({ isOpen, type, onClose, onSuccess, initialData
                         )}
                     </div>
 
-                    {}
+                    { }
                     <div>
                         <label className="text-xs font-bold uppercase tracking-wider text-slate-400 ml-2">Data</label>
                         <div className="mt-2 flex items-center gap-2 rounded-2xl bg-slate-50 px-4 py-3">
@@ -227,7 +228,7 @@ export function TransactionModal({ isOpen, type, onClose, onSuccess, initialData
                         </div>
                     </div>
 
-                    {}
+                    { }
                     <Button
                         onClick={handleSubmit}
                         disabled={isSubmitting}

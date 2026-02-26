@@ -11,15 +11,15 @@ export default defineConfig({
             manifest: {
                 name: 'Finantree',
                 short_name: 'Finantree',
-                theme_color: '#059669',
+                theme_color: '#059669', // Emerald 600 as the primary brand color
                 background_color: '#ffffff',
                 display: 'standalone',
                 icons: [
                     {
-                        src: '/pwa-192x192.png',
+                        src: '/pwa-512x512.png',
                         sizes: '192x192',
                         type: 'image/png',
-                        purpose: 'any maskable'
+                        purpose: 'any'
                     },
                     {
                         src: '/pwa-512x512.png',
@@ -28,6 +28,9 @@ export default defineConfig({
                         purpose: 'any maskable'
                     }
                 ]
+            },
+            workbox: {
+                cleanupOutdatedCaches: true
             }
         })
     ],

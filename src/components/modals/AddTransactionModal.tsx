@@ -82,9 +82,9 @@ export function AddTransactionModal({ isOpen, onClose, onSave }: AddTransactionM
                 payment_date: new Date().toISOString(),
                 status: 'completed'
             })
-
             toast.success("Transação adicionada com sucesso!")
-            onSave({}) 
+            window.dispatchEvent(new CustomEvent('transaction_updated'))
+            onSave({})
             onClose()
         } catch (error) {
             toast.error("Erro ao salvar transação.")
@@ -99,7 +99,7 @@ export function AddTransactionModal({ isOpen, onClose, onSave }: AddTransactionM
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4 backdrop-blur-sm">
             <div className="relative w-full max-w-md overflow-hidden rounded-[32px] bg-white shadow-2xl animate-in fade-in zoom-in-95 duration-200">
 
-                {}
+                { }
                 <div className="flex items-center justify-between p-6 pb-2">
                     <h2 className="text-xl font-bold text-slate-900">Nova Transação</h2>
                     <button onClick={onClose} className="rounded-full bg-slate-100 p-2 text-slate-400 hover:bg-slate-200 hover:text-slate-600 transition-colors">
@@ -108,7 +108,7 @@ export function AddTransactionModal({ isOpen, onClose, onSave }: AddTransactionM
                 </div>
 
                 <div className="p-6 pt-2 space-y-6">
-                    {}
+                    { }
                     <div className="flex rounded-full bg-slate-100 p-1">
                         <button
                             onClick={() => setType('expense')}
@@ -132,7 +132,7 @@ export function AddTransactionModal({ isOpen, onClose, onSave }: AddTransactionM
                         </button>
                     </div>
 
-                    {}
+                    { }
                     <div>
                         <label className="text-xs font-bold uppercase tracking-wider text-slate-400 ml-2">Valor</label>
                         <div className="mt-2">
@@ -145,7 +145,7 @@ export function AddTransactionModal({ isOpen, onClose, onSave }: AddTransactionM
                         </div>
                     </div>
 
-                    {}
+                    { }
                     <div>
                         <label className="text-xs font-bold uppercase tracking-wider text-slate-400 ml-2">Descrição</label>
                         <input
@@ -157,7 +157,7 @@ export function AddTransactionModal({ isOpen, onClose, onSave }: AddTransactionM
                         />
                     </div>
 
-                    {}
+                    { }
                     <div>
                         <label className="text-xs font-bold uppercase tracking-wider text-slate-400 ml-2">Categoria</label>
                         {isLoading ? (
@@ -194,7 +194,7 @@ export function AddTransactionModal({ isOpen, onClose, onSave }: AddTransactionM
                         )}
                     </div>
 
-                    {}
+                    { }
                     <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
                             <label className="text-xs font-bold uppercase tracking-wider text-slate-400 ml-2">Data</label>
@@ -212,7 +212,7 @@ export function AddTransactionModal({ isOpen, onClose, onSave }: AddTransactionM
                         </div>
                     </div>
 
-                    {}
+                    { }
                     <Button
                         onClick={handleSave}
                         disabled={isSubmitting}

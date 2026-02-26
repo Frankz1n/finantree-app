@@ -59,6 +59,15 @@ export default function Extract() {
         if (user) {
             loadTransactions()
         }
+
+        const handleTransactionUpdate = () => {
+            if (user) loadTransactions()
+        }
+        window.addEventListener('transaction_updated', handleTransactionUpdate)
+
+        return () => {
+            window.removeEventListener('transaction_updated', handleTransactionUpdate)
+        }
     }, [user, searchParams])
 
     const loadTransactions = async () => {
@@ -120,7 +129,7 @@ export default function Extract() {
 
     return (
         <div className="space-y-6 pb-24 md:pb-8">
-            {}
+            { }
             <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
                 <div>
                     <h1 className="text-3xl font-bold text-slate-900">Extrato</h1>
@@ -128,7 +137,7 @@ export default function Extract() {
                 </div>
 
                 <div className="flex flex-col gap-3 lg:flex-row lg:items-center">
-                    {}
+                    { }
                     <div className="relative">
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
                         <input
@@ -149,16 +158,16 @@ export default function Extract() {
                 </div>
             </div>
 
-            {}
+            { }
             <SummaryCards spent={summary.spent} income={summary.income} saved={summary.saved} />
 
-            {}
+            { }
             <div className="space-y-4">
 
-                {}
+                { }
                 <div className="flex flex-col lg:flex-row gap-4 justify-between items-start lg:items-center">
 
-                    {}
+                    { }
                     <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
                         {['Todos', 'Entradas', 'Saídas', 'Investimentos'].map((typeLabel) => {
                             const typeMap: Record<string, string> = {
@@ -185,7 +194,7 @@ export default function Extract() {
                         })}
                     </div>
 
-                    {}
+                    { }
                     <div className="flex w-full md:w-auto items-center gap-2 bg-white p-1 rounded-full border border-slate-200 shadow-sm">
                         <div className="relative flex-1">
                             <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={14} />
@@ -208,7 +217,7 @@ export default function Extract() {
                     </div>
                 </div>
 
-                {}
+                { }
                 <div className="space-y-1">
                     <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400 px-1">Filtrar por Categoria</p>
                     <div className="relative">
@@ -240,14 +249,14 @@ export default function Extract() {
                 </div>
             </div>
 
-            {}
+            { }
             <TransactionList
                 transactions={transactions}
                 onEdit={handleEdit}
                 onDelete={handleDeleteClick}
             />
 
-            {}
+            { }
             <AddTransactionModal
                 isOpen={isAddModalOpen}
                 onClose={() => setIsAddModalOpen(false)}

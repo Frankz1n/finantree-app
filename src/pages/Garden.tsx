@@ -29,6 +29,15 @@ export default function Garden() {
             checkOnboarding()
             loadSavingBoxes()
         }
+
+        const handleTransactionUpdate = () => {
+            if (user) loadSavingBoxes()
+        }
+        window.addEventListener('transaction_updated', handleTransactionUpdate)
+
+        return () => {
+            window.removeEventListener('transaction_updated', handleTransactionUpdate)
+        }
     }, [user])
 
     const checkOnboarding = async () => {

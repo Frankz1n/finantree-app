@@ -167,7 +167,7 @@ export default function Login() {
                 { }
                 <div className="text-center space-y-6">
                     <p className="text-sm text-slate-500 font-medium">
-                        ¿Novo por aqui?{" "}
+                        Novo por aqui?{" "}
                         <a href="/register" className="font-bold text-[#00C980] hover:text-[#00b372] hover:underline transition-colors">
                             Criar conta grátis
                         </a>

@@ -44,9 +44,16 @@ export function DashboardAnalytics() {
         }
     };
 
-    // Load Initial e Escuta do TimeFilter (apenas no React)
+    // Load Initial e Escuta do TimeFilter e Custom Events
     useEffect(() => {
         fetchData();
+
+        const handleTransactionUpdate = () => fetchData()
+        window.addEventListener('transaction_updated', handleTransactionUpdate)
+
+        return () => {
+            window.removeEventListener('transaction_updated', handleTransactionUpdate)
+        }
     }, [user]);
 
     // Supabase Realtime Subscription
