@@ -2,13 +2,14 @@ import { useEffect, useState, useCallback } from "react"
 import { useAuth } from "@/hooks/useAuth"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Plus, Wallet, TrendingUp, ShoppingCart, Clapperboard, Briefcase, Car, Flame } from "lucide-react"
+import { Plus, Wallet, TrendingUp, ShoppingCart, Clapperboard, Briefcase, Car, Flame, Globe } from "lucide-react"
 import { formatCurrency } from "@/lib/utils"
 import { TransactionService } from "@/services/transactions"
 import { Transaction } from "@/types/finance"
 import { TransparencyConsentModal } from "@/components/modals/TransparencyConsentModal"
 import { TransactionModal } from "@/components/modals/TransactionModal"
 import { GoalModal } from "@/components/modals/GoalModal"
+import { CurrencyConverterModal } from "@/components/modals/CurrencyConverterModal"
 import { DashboardAnalytics } from "@/components/dashboard/DashboardAnalytics"
 
 export default function Dashboard() {
@@ -24,6 +25,7 @@ export default function Dashboard() {
     const [showTransactionModal, setShowTransactionModal] = useState(false)
     const [transactionType, setTransactionType] = useState<'income' | 'expense'>('expense')
     const [showGoalModal, setShowGoalModal] = useState(false)
+    const [showCurrencyModal, setShowCurrencyModal] = useState(false)
 
 
     const scorePercentage = Math.min(Math.max(efficiencyScore / 10, 0), 100);
@@ -161,6 +163,16 @@ export default function Dashboard() {
                                 </div>
                                 <span className="text-xs font-bold">Nova Meta</span>
                             </Button>
+
+                            <Button
+                                onClick={() => setShowCurrencyModal(true)}
+                                className="w-full h-auto aspect-square lg:w-32 lg:h-32 flex-col gap-2 md:gap-3 rounded-[24px] md:rounded-[32px] bg-[#3B82F6] hover:bg-[#2563EB] text-white shadow-lg shadow-blue-200/50 hover:scale-105 transition-transform p-4"
+                            >
+                                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white/20">
+                                    <Globe size={24} />
+                                </div>
+                                <span className="text-xs font-bold">Conversor</span>
+                            </Button>
                         </div>
                     </div>
                 </div>
@@ -250,6 +262,11 @@ export default function Dashboard() {
                 isOpen={showGoalModal}
                 onClose={() => setShowGoalModal(false)}
                 onSuccess={refreshData}
+            />
+
+            <CurrencyConverterModal
+                isOpen={showCurrencyModal}
+                onClose={() => setShowCurrencyModal(false)}
             />
 
         </>
