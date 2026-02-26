@@ -1,20 +1,60 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { mockSubscriptions } from "@/mocks/subscriptions"
 import { formatCurrency } from "@/lib/utils"
-import { ChevronDown, ChevronUp, Repeat, CreditCard, ArrowLeft } from "lucide-react"
+import { ChevronDown, ChevronUp, Repeat, CreditCard, ArrowLeft, Sparkles, X } from "lucide-react"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { useNavigate } from "react-router-dom"
+import { toast } from "sonner"
+import { GamificationService } from "@/services/gamification"
 
 export default function Subscriptions() {
     const navigate = useNavigate()
     const [expandedId, setExpandedId] = useState<string | null>(null)
+    const [subscriptions, setSubscriptions] = useState(mockSubscriptions)
+    const [showTip, setShowTip] = useState(false)
+    const [isTipDismissed, setIsTipDismissed] = useState(false)
+
+    useEffect(() => {
+        if (isTipDismissed) return;
+
+        const timer = setTimeout(() => {
+            const hasStreaming = subscriptions.some(s => s.category === 'Streaming');
+            if (hasStreaming) {
+                setShowTip(true)
+            }
+        }, 1500)
+
+        return () => clearTimeout(timer)
+    }, [isTipDismissed, subscriptions])
+
+    const handleAcceptTip = () => {
+        // Find a streaming subscription to "cancel" (e.g. Netflix)
+        const subToCancel = subscriptions.find(s => s.category === 'Streaming')
+
+        if (subToCancel) {
+            // Remove it from the list visually
+            setSubscriptions(prev => prev.filter(s => s.id !== subToCancel.id))
+            setShowTip(false)
+            setIsTipDismissed(true)
+
+            // Trigger Gamification
+            GamificationService.triggerConfetti()
+            toast.success(
+                <div className="flex flex-col gap-1">
+                    <span className="font-bold">🎉 Ótima decisão!</span>
+                    <span>Você ganhou <strong className="text-emerald-400">+50 XP do Oráculo</strong> e ajudou a sua Árvore a crescer!</span>
+                </div>,
+                { duration: 5000 }
+            )
+        }
+    }
 
     const toggleExpand = (id: string) => {
         setExpandedId(expandedId === id ? null : id)
     }
 
-    const totalRecurring = mockSubscriptions.reduce((acc, sub) => acc + sub.amount, 0)
+    const totalRecurring = subscriptions.reduce((acc, sub) => acc + sub.amount, 0)
 
     const getStatusColor = (status: string) => {
         switch (status) {
@@ -62,14 +102,63 @@ export default function Subscriptions() {
                     </div>
                 </div>
                 <p className="text-sm text-slate-300 font-medium">
-                    Você tem {mockSubscriptions.length} assinaturas ativas monitoradas via Open Finance nesta simulação.
+                    Você tem {subscriptions.length} assinaturas ativas monitoradas via Open Finance nesta simulação.
                 </p>
             </Card>
+
+            {/* O Oráculo Tip */}
+            {showTip && (
+                <div className="animate-in slide-in-from-top fade-in duration-500 relative overflow-hidden rounded-[24px] bg-gradient-to-r from-indigo-500 to-purple-600 p-5 shadow-lg shadow-purple-500/30 text-white">
+                    <div className="absolute top-0 right-0 p-4 opacity-20 pointer-events-none">
+                        <Sparkles size={64} />
+                    </div>
+
+                    <div className="relative z-10 flex gap-4">
+                        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-white/20 shadow-inner backdrop-blur-md">
+                            <Sparkles size={24} className="text-white" />
+                        </div>
+                        <div className="flex-1 space-y-3">
+                            <h3 className="font-bold text-lg flex items-center gap-2">
+                                Oráculo <span className="text-xs font-normal px-2 py-0.5 rounded-full bg-white/20 uppercase tracking-wider">Dica Inteligente</span>
+                            </h3>
+                            <p className="text-purple-100 text-sm leading-relaxed">
+                                Notei que você tem várias assinaturas de streaming. Se cancelar uma delas (ex: Netflix), a sua meta de viagem ficará mais próxima! Deseja cancelar e poupar?
+                            </p>
+
+                            <div className="flex items-center gap-3 pt-2">
+                                <Button
+                                    onClick={handleAcceptTip}
+                                    className="bg-white text-purple-600 hover:bg-purple-50 font-bold rounded-full shadow-md"
+                                >
+                                    Aceitar Dica
+                                </Button>
+                                <Button
+                                    onClick={() => {
+                                        setShowTip(false);
+                                        setIsTipDismissed(true);
+                                    }}
+                                    variant="ghost"
+                                    className="text-purple-200 hover:text-white hover:bg-white/10 rounded-full"
+                                >
+                                    Ignorar
+                                </Button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button
+                        onClick={() => setShowTip(false)}
+                        className="absolute top-3 right-3 text-purple-200 hover:text-white transition-colors"
+                    >
+                        <X size={18} />
+                    </button>
+                </div>
+            )}
 
             <div className="space-y-4">
                 <h3 className="text-lg font-bold text-slate-900 px-2">Suas Assinaturas</h3>
                 <div className="grid gap-4">
-                    {mockSubscriptions.map((sub) => {
+                    {subscriptions.map((sub) => {
                         const isExpanded = expandedId === sub.id
                         const totalSpent = sub.paymentHistory.reduce((acc, p) => acc + p.amount, 0)
 
