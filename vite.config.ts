@@ -11,7 +11,7 @@ export default defineConfig({
             manifest: {
                 name: 'Finantree',
                 short_name: 'Finantree',
-                theme_color: '#059669', // Emerald 600 as the primary brand color
+                theme_color: '#059669',
                 background_color: '#ffffff',
                 display: 'standalone',
                 icons: [
