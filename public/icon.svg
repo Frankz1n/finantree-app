@@ -1,14 +1,7 @@
 <svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <defs>
-    <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#34d399" />
-      <stop offset="100%" stop-color="#059669" />
-    </linearGradient>
-  </defs>
-  <rect width="512" height="512" rx="128" fill="url(#grad)" />
-  <g transform="translate(136, 136) scale(10)" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none">
-    <path d="M7 20h10"/>
-    <path d="M10 20c5.5-5.5.5-16 .5-16"/>
-    <path d="M10.5 12.5c2.5-2.5 7.5-.5 7.5-.5s-1-5-7.5-5M6 10s4 2 4.5 5.5"/>
-  </g>
+<rect width="512" height="512" rx="87" fill="#10B981"/>
+<path d="M174 409H356" stroke="white" stroke-width="38" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M229 409C328 361.5 243.4 287.4 283 219" stroke="white" stroke-width="38" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M220.128 207.117C240.154 222.407 252.897 249.165 262 277.834C225.59 285.48 198.282 285.48 174.615 272.101C152.769 260.633 132.744 235.786 120 191.826C170.974 182.27 200.103 191.826 220.128 207.117Z" stroke="white" stroke-width="38" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M303.038 142.333C289.196 165.172 282.233 191.901 283.067 219C317.562 217.083 342.98 207.5 361.136 192.167C379.291 173 390.184 148.083 392 104C342.98 105.917 319.378 123.167 303.038 142.333Z" stroke="white" stroke-width="38" stroke-linecap="round" stroke-linejoin="round"/>
 </svg>
