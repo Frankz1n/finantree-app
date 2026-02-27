@@ -6,6 +6,9 @@ import { supabase } from "@/lib/supabase"
 import { RankingOnboardingModal } from "@/components/modals/RankingOnboardingModal"
 import { Skeleton } from "@/components/ui/skeleton"
 import { LeagueRanking } from "@/types/finance"
+import { useLeagueCycle } from "@/hooks/useLeagueCycle"
+import { Button } from "@/components/ui/button"
+import { toast } from "sonner"
 
 
 
@@ -17,23 +20,41 @@ import { LeagueRanking } from "@/types/finance"
 
 
 
+
+const dbToUI: Record<string, string> = {
+    'semente': 'Semente',
+    'broto': 'Broto',
+    'arvore': 'Árvore',
+    'floresta': 'Floresta',
+    'fauna': 'Fauna'
+};
+
+const uiToDB: Record<string, string> = {
+    'Semente': 'semente',
+    'Broto': 'broto',
+    'Árvore': 'arvore',
+    'Floresta': 'floresta',
+    'Fauna': 'fauna'
+};
 
 const LEAGUES = [
-    { id: 'seed', label: 'Semente', icon: Sprout, color: 'text-emerald-300' },
-    { id: 'sprout', label: 'Broto', icon: Leaf, color: 'text-emerald-400' },
-    { id: 'tree', label: 'Árvore', icon: TreeDeciduous, color: 'text-emerald-500' },
-    { id: 'forest', label: 'Floresta', icon: TreePine, color: 'text-emerald-600' },
+    { id: 'semente', label: 'Semente', icon: Sprout, color: 'text-emerald-300' },
+    { id: 'broto', label: 'Broto', icon: Leaf, color: 'text-emerald-400' },
+    { id: 'arvore', label: 'Árvore', icon: TreeDeciduous, color: 'text-emerald-500' },
+    { id: 'floresta', label: 'Floresta', icon: TreePine, color: 'text-emerald-600' },
     { id: 'fauna', label: 'Fauna', icon: PawPrint, color: 'text-amber-500' },
 ]
 
 export default function Ranking() {
     const { user } = useAuth()
-    const [currentLeague, setCurrentLeague] = useState('sprout')
-    const [userLeague, setUserLeague] = useState<string>('sprout')
+    const { timeLeft } = useLeagueCycle()
+    const [currentLeague, setCurrentLeague] = useState('semente')
+    const [userLeague, setUserLeague] = useState<string>('semente')
     const [userXP, setUserXP] = useState<number>(0)
     const [rankingList, setRankingList] = useState<LeagueRanking[]>([])
     const [loading, setLoading] = useState(true)
     const [showOnboarding, setShowOnboarding] = useState(false)
+    const [showManualRules, setShowManualRules] = useState(false)
 
     useEffect(() => {
         if (user) {
@@ -57,16 +78,35 @@ export default function Ranking() {
             if (profileError) throw profileError
 
             if (profile) {
-                setUserLeague(profile.current_league || 'sprout')
+                const fetchedLeague = profile.current_league;
+                let finalLeague = fetchedLeague;
+
+                if (!fetchedLeague) {
+                    finalLeague = 'semente';
+
+                    // Silent update to fix DB missing value so user is not permanently stuck
+                    supabase.from('profiles').update({ current_league: 'semente' }).eq('id', user.id).then();
+                }
+
+                setUserLeague(finalLeague)
                 setUserXP(profile.xp || 0)
 
-                setCurrentLeague(profile.current_league || 'sprout')
+                setCurrentLeague(finalLeague)
+
+                // Triggers Fauna Rules natively if user reached Fauna and hasn't seen the rules yet
+                if (finalLeague === 'fauna') {
+                    const hasSeenFaunaRules = localStorage.getItem(`has_seen_fauna_rules_${user.id}`);
+                    if (!hasSeenFaunaRules) {
+                        setShowManualRules(true);
+                        localStorage.setItem(`has_seen_fauna_rules_${user.id}`, 'true');
+                    }
+                }
 
 
                 const { data: rankings, error: rankingError } = await supabase
                     .from('league_rankings')
                     .select('*')
-                    .eq('current_league', profile.current_league || 'sprout')
+                    .eq('current_league', finalLeague)
                     .order('position', { ascending: true })
 
                 if (rankingError) throw rankingError
@@ -96,7 +136,53 @@ export default function Ranking() {
 
     const currentUserRanking = rankingList.find(u => u.user_id === user?.id)
 
+    const handleSimulateEndCycle = async () => {
+        if (!user || loading) return;
 
+        try {
+            setLoading(true);
+            let newLeague = userLeague;
+            let message = "O ciclo terminou. Sua liga foi mantida e seu XP zerado para a nova semana!";
+
+            if (currentUserRanking) {
+                const currentLeagueIndex = LEAGUES.findIndex(l => l.id === userLeague);
+
+                // Promoção: Top 10 e não está na última liga
+                if (currentUserRanking.position <= 10 && currentLeagueIndex < LEAGUES.length - 1) {
+                    newLeague = LEAGUES[currentLeagueIndex + 1].id;
+                    message = "🎉 Parabéns! Você foi promovido de liga! Seu XP foi zerado para a nova semana!";
+                }
+                // Rebaixamento: Últimos 10 (se mais de 20 usuários) e não está na primeira liga
+                else if (rankingList.length > 20 && currentUserRanking.position >= rankingList.length - 10 && currentLeagueIndex > 0) {
+                    newLeague = LEAGUES[currentLeagueIndex - 1].id;
+                    message = "🔻 Você foi rebaixado de liga. Continue se esforçando! Seu XP foi zerado para a nova semana.";
+                }
+            }
+
+            // Garante mapping limpo de ENUM (lowercase, no accents)
+            const safeLeagueEnum = uiToDB[newLeague] || newLeague;
+
+            const { error } = await supabase
+                .from('profiles')
+                .update({
+                    current_league: safeLeagueEnum,
+                    xp: 0
+                })
+                .eq('id', user.id);
+
+            if (error) throw error;
+
+            toast.success(message, { duration: 5000 });
+
+            await fetchRankingData();
+
+        } catch (error) {
+            console.error("Error simulating end of cycle:", error);
+            toast.error("Erro ao simular fim de ciclo.");
+        } finally {
+            setLoading(false);
+        }
+    }
 
     const stickyUser: LeagueRanking = currentUserRanking || {
         user_id: user?.id || '',
@@ -107,18 +193,48 @@ export default function Ranking() {
         position: 0
     }
 
-    const isLocked = currentLeague !== userLeague
+    const isLocked = currentLeague.toLowerCase() !== userLeague.toLowerCase()
 
     return (
         <div className="space-y-6 pb-40"> { }
-            <header className="space-y-2">
-                <h1 className="text-3xl font-bold text-slate-900">Ranking</h1>
-                <p className="text-slate-500 font-medium">
-                    "A competição é a lei da selva, mas a cooperação é a lei da civilização."
-                </p>
+            <header className="space-y-2 flex justify-between items-start">
+                <div>
+                    <h1 className="text-3xl font-bold text-slate-900">Ranking</h1>
+                    <p className="text-slate-500 font-medium">
+                        "A competição é a lei da selva, mas a cooperação é a lei da civilização."
+                    </p>
+                </div>
+                <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleSimulateEndCycle}
+                    className="text-xs bg-amber-50 text-amber-600 border-amber-200 hover:bg-amber-100 hidden md:flex"
+                >
+                    Simular Fim da Liga
+                </Button>
             </header>
 
+            {/* Mobile simulator button, so it fits properly on small screens too */}
+            <div className="md:hidden flex justify-end">
+                <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleSimulateEndCycle}
+                    className="text-xs w-full bg-amber-50 text-amber-600 border-amber-200 hover:bg-amber-100"
+                >
+                    Simular Fim da Liga
+                </Button>
+            </div>
+
             { }
+            <div className="flex justify-end w-full mb-1 px-1">
+                <button
+                    onClick={() => setShowManualRules(true)}
+                    className="text-xs font-bold text-amber-500 hover:text-amber-600 transition-colors uppercase tracking-wider"
+                >
+                    Ver regras
+                </button>
+            </div>
             <div className="flex overflow-x-auto gap-2 pb-2 scrollbar-hide">
                 {LEAGUES.map((league) => {
                     const Icon = league.icon
@@ -152,7 +268,7 @@ export default function Ranking() {
             </div>
 
             { }
-            {currentLeague === 'fauna' && (
+            {currentLeague.toLowerCase() === 'fauna' && (
                 <div className="rounded-2xl bg-gradient-to-r from-amber-200 to-yellow-400 p-6 shadow-lg shadow-amber-200/50 flex items-center gap-4 animate-in fade-in slide-in-from-top-4">
                     <div className="h-12 w-12 bg-white/30 rounded-full flex items-center justify-center backdrop-blur-sm">
                         <Trophy className="text-amber-900" size={24} />
@@ -160,7 +276,7 @@ export default function Ranking() {
                     <div>
                         <h3 className="font-bold text-amber-900 text-lg">Prêmio da Temporada</h3>
                         <p className="text-amber-800 font-medium text-sm">
-                            🏆 Os top 10 da temporada concorrem a <span className="font-bold underline">R$ 500,00!</span>
+                            🏆 Fique em primeiro lugar e ganhe <span className="font-bold underline">R$ 500,00!</span>
                         </p>
                     </div>
                 </div>
@@ -203,14 +319,16 @@ export default function Ranking() {
                             </p>
                         </div>
                         <div className="text-xs font-bold text-slate-400 uppercase tracking-widest bg-slate-50 px-4 py-2 rounded-full">
-                            Sua Liga: {LEAGUES.find(l => l.id === userLeague)?.label}
+                            Sua Liga: {dbToUI[userLeague] || LEAGUES.find(l => l.id === userLeague)?.label}
                         </div>
                     </div>
                 ) : (
                     <>
-                        <div className="p-6 border-b border-slate-100 bg-slate-50/50 flex justify-between items-center">
+                        <div className="p-6 border-b border-slate-100 bg-slate-50/50 flex justify-between items-center flex-wrap gap-2">
                             <h3 className="font-bold text-slate-900">Classificação Atual</h3>
-                            <span className="text-xs font-medium text-slate-400 uppercase tracking-wider">Reinicia em 3 dias</span>
+                            <span className="text-xs font-medium text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full uppercase tracking-wider animate-pulse flex items-center gap-1">
+                                ⏳ Termina em {timeLeft}
+                            </span>
                         </div>
 
                         <div className="divide-y divide-slate-100">
@@ -336,6 +454,12 @@ export default function Ranking() {
                 isOpen={showOnboarding}
                 onClose={() => setShowOnboarding(false)}
             />
+
+            <RankingOnboardingModal
+                isOpen={showManualRules}
+                onClose={() => setShowManualRules(false)}
+                isManualView={true}
+            />
         </div>
     )
-}
+} 

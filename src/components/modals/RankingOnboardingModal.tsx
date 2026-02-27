@@ -9,14 +9,20 @@ import { Trophy, ArrowUp, Instagram, Calendar } from "lucide-react"
 interface RankingOnboardingModalProps {
     isOpen: boolean
     onClose: () => void
+    isManualView?: boolean
 }
 
-export function RankingOnboardingModal({ isOpen, onClose }: RankingOnboardingModalProps) {
+export function RankingOnboardingModal({ isOpen, onClose, isManualView = false }: RankingOnboardingModalProps) {
     const { user } = useAuth()
     const [isLoading, setIsLoading] = useState(false)
 
     const handleClose = async () => {
         if (!user) return
+
+        if (isManualView) {
+            onClose()
+            return
+        }
 
         setIsLoading(true)
         try {
@@ -106,7 +112,7 @@ export function RankingOnboardingModal({ isOpen, onClose }: RankingOnboardingMod
                         className="w-full rounded-2xl bg-slate-900 h-12 text-base font-bold hover:bg-slate-800 transition-all hover:scale-[1.02] shadow-lg shadow-slate-200"
                         disabled={isLoading}
                     >
-                        {isLoading ? "Entrando..." : "Bora pro jogo!"}
+                        {isManualView ? "Entendi" : (isLoading ? "Entrando..." : "Bora pro jogo!")}
                     </Button>
                 </DialogFooter>
             </DialogContent>
