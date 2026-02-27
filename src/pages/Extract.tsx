@@ -8,7 +8,7 @@ import { TransactionList } from "@/components/transactions/TransactionList"
 import { AddTransactionModal } from "@/components/modals/AddTransactionModal"
 import { TransactionModal } from "@/components/modals/TransactionModal"
 import { ConfirmDeleteModal } from "@/components/modals/ConfirmDeleteModal"
-import { Search, Plus, Calendar, Filter, Repeat } from "lucide-react"
+import { Search, Plus, Calendar, Filter, Repeat, ShoppingBag } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useDebounce } from "@/hooks/useDebounce"
 import { toast } from "sonner"
@@ -151,6 +151,13 @@ export default function Extract() {
                     </div>
 
                     <div className="flex gap-2 w-full lg:w-auto">
+                        <Button
+                            onClick={() => navigate('/parcelamentos')}
+                            variant="outline"
+                            className="rounded-full border-slate-200 text-slate-900 hover:bg-slate-50 w-full lg:w-auto"
+                        >
+                            <ShoppingBag size={18} className="mr-2" /> Parceladas
+                        </Button>
                         <Button
                             onClick={() => navigate('/assinaturas')}
                             variant="outline"
