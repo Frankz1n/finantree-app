@@ -1,7 +1,7 @@
 import { useState, useMemo } from "react"
 import { mockInstallments } from "@/mocks/installments"
 import { formatCurrency, cn } from "@/lib/utils"
-import { ShoppingBag, ArrowLeft, CreditCard } from "lucide-react"
+import { ShoppingBag, ArrowLeft, CreditCard, ChevronDown, ChevronUp, Clock, CheckCircle2 } from "lucide-react"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { useNavigate } from "react-router-dom"
@@ -9,6 +9,11 @@ import { useNavigate } from "react-router-dom"
 export default function Installments() {
     const navigate = useNavigate()
     const [activeTab, setActiveTab] = useState<string>("all")
+    const [expandedId, setExpandedId] = useState<string | null>(null)
+
+    const toggleExpand = (id: string) => {
+        setExpandedId(expandedId === id ? null : id)
+    }
 
     // Derived State
     const { totalRemaining, monthlyCommitment, banks } = useMemo(() => {
@@ -142,51 +147,103 @@ export default function Installments() {
                         return (
                             <Card
                                 key={item.id}
-                                className="overflow-hidden rounded-[24px] border border-slate-100 bg-white shadow-sm p-5 hover:shadow-md transition-shadow"
+                                className={cn("overflow-hidden rounded-[24px] border border-slate-100 bg-white shadow-sm hover:shadow-md transition-shadow", expandedId === item.id ? "ring-2 ring-slate-100" : "")}
                             >
-                                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                                    <div className="flex items-center gap-4">
-                                        <div className={cn("flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br shadow-inner text-white", getBankGradient(item.banco))}>
-                                            <ShoppingBag size={20} />
+                                <div className="p-5 cursor-pointer" onClick={() => toggleExpand(item.id)}>
+                                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                                        <div className="flex items-center gap-4">
+                                            <div className={cn("flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br shadow-inner text-white", getBankGradient(item.banco))}>
+                                                <ShoppingBag size={20} />
+                                            </div>
+                                            <div>
+                                                <h4 className="font-bold text-slate-900 text-lg">{item.nomeCompra}</h4>
+                                                <div className="flex items-center gap-2 mt-1">
+                                                    <span className={cn("px-2 py-0.5 rounded-full text-[10px] font-bold border", getBankColor(item.banco))}>
+                                                        {item.banco}
+                                                    </span>
+                                                    <span className="text-[10px] font-bold text-slate-400 uppercase">
+                                                        {new Date(item.dataCompra).toLocaleDateString('pt-BR', { month: 'short', year: 'numeric' })}
+                                                    </span>
+                                                </div>
+                                            </div>
                                         </div>
-                                        <div>
-                                            <h4 className="font-bold text-slate-900 text-lg">{item.nomeCompra}</h4>
-                                            <div className="flex items-center gap-2 mt-1">
-                                                <span className={cn("px-2 py-0.5 rounded-full text-[10px] font-bold border", getBankColor(item.banco))}>
-                                                    {item.banco}
-                                                </span>
-                                                <span className="text-[10px] font-bold text-slate-400 uppercase">
-                                                    {new Date(item.dataCompra).toLocaleDateString('pt-BR', { month: 'short', year: 'numeric' })}
-                                                </span>
+
+                                        <div className="flex items-center gap-4 w-full md:w-auto mt-2 md:mt-0">
+                                            <div className="flex flex-row md:flex-col items-center md:items-end justify-between md:justify-center w-full md:w-auto gap-2 md:gap-1">
+                                                <div className="text-left md:text-right">
+                                                    <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">Valor Mensal</div>
+                                                    <div className="font-bold text-slate-900 text-xl">{formatCurrency(item.valorParcela)}</div>
+                                                </div>
+                                                <div className="md:hidden w-px h-8 bg-slate-100 mx-2"></div>
+                                                <div className="text-right flex items-center gap-3">
+                                                    <div>
+                                                        <div className="text-[10px] font-bold text-[#00C980] uppercase tracking-wider mb-0.5">Progresso</div>
+                                                        <div className="font-bold text-slate-600 text-sm bg-slate-50 px-3 py-1 rounded-full border border-slate-100">
+                                                            {item.parcelaAtual} de {item.totalParcelas}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div className="hidden md:flex text-slate-400 ml-2">
+                                                {expandedId === item.id ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
                                             </div>
                                         </div>
                                     </div>
 
-                                    <div className="flex flex-row md:flex-col items-center md:items-end justify-between md:justify-center w-full md:w-auto mt-2 md:mt-0 gap-2 md:gap-1">
-                                        <div className="text-left md:text-right">
-                                            <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">Valor Mensal</div>
-                                            <div className="font-bold text-slate-900 text-xl">{formatCurrency(item.valorParcela)}</div>
-                                        </div>
-                                        <div className="md:hidden w-px h-8 bg-slate-100 mx-2"></div>
-                                        <div className="text-right">
-                                            <div className="text-[10px] font-bold text-[#00C980] uppercase tracking-wider mb-0.5">Progresso</div>
-                                            <div className="font-bold text-slate-600 text-sm bg-slate-50 px-3 py-1 rounded-full border border-slate-100">
-                                                {item.parcelaAtual} de {item.totalParcelas}
-                                            </div>
-                                        </div>
+                                    {/* Custom Progress Bar */}
+                                    <div className="mt-5 w-full bg-slate-100 rounded-full h-3 overflow-hidden shadow-inner flex items-center">
+                                        <div
+                                            className={cn("h-full rounded-full transition-all duration-1000 ease-out", isFinished ? "bg-[#00C980]" : "bg-[#00C980] bg-opacity-90")}
+                                            style={{ width: `${progressPercentage}%` }}
+                                        />
+                                    </div>
+
+                                    {isFinished && expandedId !== item.id && (
+                                        <p className="mt-3 text-xs font-bold text-[#00C980] text-center w-full">🎉 Compra totalmente quitada!</p>
+                                    )}
+
+                                    <div className="md:hidden flex justify-center w-full mt-4 text-slate-400">
+                                        {expandedId === item.id ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
                                     </div>
                                 </div>
 
-                                {/* Custom Progress Bar */}
-                                <div className="mt-5 w-full bg-slate-100 rounded-full h-3 overflow-hidden shadow-inner flex items-center">
-                                    <div
-                                        className={cn("h-full rounded-full transition-all duration-1000 ease-out", isFinished ? "bg-[#00C980]" : "bg-[#00C980] bg-opacity-90")}
-                                        style={{ width: `${progressPercentage}%` }}
-                                    />
-                                </div>
+                                {/* Area Expandida do Histórico */}
+                                {expandedId === item.id && (
+                                    <div className="border-t border-slate-100 bg-slate-50 p-5 md:p-6 animate-in slide-in-from-top-2 fade-in duration-300">
+                                        <h5 className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-5 flex items-center gap-2">
+                                            <Clock size={14} /> Histórico de Parcelas
+                                        </h5>
 
-                                {isFinished && (
-                                    <p className="mt-3 text-xs font-bold text-[#00C980] text-center w-full">🎉 Compra totalmente quitada!</p>
+                                        <div className="relative space-y-3 before:absolute before:inset-y-0 before:left-3 before:w-[2px] before:bg-slate-200 ml-1">
+                                            {item.installmentsHistory?.map((hist) => {
+                                                const isPaid = hist.status === 'paid';
+
+                                                return (
+                                                    <div key={hist.currentInstallment} className="relative flex items-center gap-4">
+                                                        {/* Marker */}
+                                                        <div className={cn("z-10 flex w-6 h-6 shrink-0 items-center justify-center rounded-full border-2", isPaid ? "border-[#00C980] bg-[#00C980] text-white" : "border-slate-200 bg-white text-slate-300")}>
+                                                            {isPaid ? <CheckCircle2 size={16} className="text-white" /> : <Clock size={12} />}
+                                                        </div>
+
+                                                        {/* Card da parcela */}
+                                                        <div className={cn("flex-1 flex justify-between items-center bg-white p-3 md:p-4 rounded-xl border shadow-sm transition-all", isPaid ? "border-slate-100 opacity-60" : "border-slate-200")}>
+                                                            <div>
+                                                                <div className={cn("font-bold text-sm", isPaid ? "text-slate-500 line-through decoration-slate-300 decoration-1" : "text-slate-900")}>
+                                                                    Parcela {hist.currentInstallment}
+                                                                </div>
+                                                                <div className="text-[10px] font-bold text-slate-400 uppercase mt-0.5">
+                                                                    {new Date(hist.dueDate).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' })}
+                                                                </div>
+                                                            </div>
+                                                            <div className={cn("font-bold", isPaid ? "text-slate-500 line-through decoration-slate-300 decoration-1" : "text-slate-900")}>
+                                                                {formatCurrency(hist.amount)}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                )
+                                            })}
+                                        </div>
+                                    </div>
                                 )}
                             </Card>
                         )
