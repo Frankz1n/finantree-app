@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react"
-import { useSearchParams } from "react-router-dom"
+import { useSearchParams, useNavigate } from "react-router-dom"
 import { useAuth } from "@/hooks/useAuth"
 import { TransactionService } from "@/services/transactions"
 import { Transaction } from "@/types/finance"
@@ -8,7 +8,7 @@ import { TransactionList } from "@/components/transactions/TransactionList"
 import { AddTransactionModal } from "@/components/modals/AddTransactionModal"
 import { TransactionModal } from "@/components/modals/TransactionModal"
 import { ConfirmDeleteModal } from "@/components/modals/ConfirmDeleteModal"
-import { Search, Plus, Calendar, Filter } from "lucide-react"
+import { Search, Plus, Calendar, Filter, Repeat } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useDebounce } from "@/hooks/useDebounce"
 import { toast } from "sonner"
@@ -16,6 +16,7 @@ import { toast } from "sonner"
 export default function Extract() {
     const { user } = useAuth()
     const [searchParams, setSearchParams] = useSearchParams()
+    const navigate = useNavigate()
 
     const [transactions, setTransactions] = useState<Transaction[]>([])
     const [summary, setSummary] = useState({ spent: 0, income: 0, saved: 0 })
@@ -149,12 +150,21 @@ export default function Extract() {
                         />
                     </div>
 
-                    <Button
-                        onClick={() => setIsAddModalOpen(true)}
-                        className="rounded-full bg-slate-900 text-white hover:bg-slate-800 w-full lg:w-auto"
-                    >
-                        <Plus size={18} className="mr-2" /> Novo
-                    </Button>
+                    <div className="flex gap-2 w-full lg:w-auto">
+                        <Button
+                            onClick={() => navigate('/assinaturas')}
+                            variant="outline"
+                            className="rounded-full border-slate-200 text-slate-900 hover:bg-slate-50 w-full lg:w-auto"
+                        >
+                            <Repeat size={18} className="mr-2" /> Assinaturas
+                        </Button>
+                        <Button
+                            onClick={() => setIsAddModalOpen(true)}
+                            className="rounded-full bg-slate-900 text-white hover:bg-slate-800 w-full lg:w-auto"
+                        >
+                            <Plus size={18} className="mr-2" /> Novo
+                        </Button>
+                    </div>
                 </div>
             </div>
 
