@@ -29,7 +29,6 @@ export const useAuth = () => {
     }, []);
 
 
-    const [streak, setStreak] = useState(0);
     const [efficiencyScore, setEfficiencyScore] = useState(0);
 
     useEffect(() => {
@@ -37,20 +36,6 @@ export const useAuth = () => {
 
         const checkIn = async () => {
             try {
-
-                const { data, error } = await supabase.rpc('handle_daily_checkin');
-
-                if (error) {
-                    console.error("Error doing daily check-in RPC:", error);
-                    return;
-                }
-
-
-                if (data) {
-                    setStreak(data.new_streak);
-                }
-
-
                 const { data: profile } = await supabase
                     .from('profiles')
                     .select('efficiency_score')
@@ -76,7 +61,7 @@ export const useAuth = () => {
             await action();
         } catch (err: any) {
             setError(err.message);
-            throw err; 
+            throw err;
         } finally {
             setLoading(false);
         }
@@ -91,7 +76,6 @@ export const useAuth = () => {
         signIn: (email: string, pass: string) => handleAuthAction(() => AuthService.signIn(email, pass)),
         signOut: () => handleAuthAction(AuthService.signOut),
         isAuthenticated: !!user,
-        streak,
         efficiencyScore,
     };
 };

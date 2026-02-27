@@ -2,7 +2,7 @@ import { useEffect, useState, useCallback } from "react"
 import { useAuth } from "@/hooks/useAuth"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Plus, Wallet, TrendingUp, ShoppingCart, Clapperboard, Briefcase, Car, Flame, Globe } from "lucide-react"
+import { Plus, Wallet, TrendingUp, ShoppingCart, Clapperboard, Briefcase, Car, Globe } from "lucide-react"
 import { formatCurrency } from "@/lib/utils"
 import { TransactionService } from "@/services/transactions"
 import { Transaction } from "@/types/finance"
@@ -11,9 +11,10 @@ import { TransactionModal } from "@/components/modals/TransactionModal"
 import { GoalModal } from "@/components/modals/GoalModal"
 import { CurrencyConverterModal } from "@/components/modals/CurrencyConverterModal"
 import { DashboardAnalytics } from "@/components/dashboard/DashboardAnalytics"
+import { StreakBadge } from "@/components/StreakBadge"
 
 export default function Dashboard() {
-    const { user, streak, efficiencyScore } = useAuth()
+    const { user, efficiencyScore } = useAuth()
     const firstName = user?.user_metadata?.full_name?.split(' ')[0] || "Usuário"
 
     const [balance, setBalance] = useState(0)
@@ -93,9 +94,8 @@ export default function Dashboard() {
                     <p className="text-slate-500 font-medium mt-1">Vamos cultivar sua riqueza.</p>
                 </div>
 
-                <div className="flex items-center gap-2 rounded-full bg-orange-50 px-4 py-2 text-orange-600 border border-orange-100 shadow-sm">
-                    <Flame size={18} fill="currentColor" className="text-orange-500" />
-                    <span className="text-sm font-bold">Sequência de {streak} dias</span>
+                <div className="flex items-center gap-2">
+                    <StreakBadge />
                 </div>
             </header>
 

@@ -23,18 +23,17 @@ import { useEffect, useState } from 'react'
 import { SharingService } from './services/sharing'
 import { GamificationService } from './services/gamification'
 import { ConsentModal } from './components/modals/ConsentModal'
+import { StreakProvider, useStreak } from './contexts/StreakContext'
 
 function App() {
-    const { user, loading, streak } = useAuth()
+    const { user, loading } = useAuth()
     const [inviteData, setInviteData] = useState<any>(null)
 
     useEffect(() => {
         const checkInvites = async () => {
             if (user?.email) {
-
                 const invites = await SharingService.checkInvites(user.email)
                 if (invites && invites.length > 0) {
-
                     setInviteData(invites[0])
                 }
             }
@@ -42,9 +41,8 @@ function App() {
 
         if (user) {
             checkInvites()
-            GamificationService.checkAchievements(user.id, streak)
         }
-    }, [user, streak])
+    }, [user])
 
     if (loading) {
         return (
@@ -60,6 +58,25 @@ function App() {
 
     return (
         <Router>
+            <StreakProvider>
+                <AppContent inviteData={inviteData} setInviteData={setInviteData} />
+            </StreakProvider>
+        </Router>
+    )
+}
+
+function AppContent({ inviteData, setInviteData }: { inviteData: any, setInviteData: any }) {
+    const { user } = useAuth()
+    const { streak } = useStreak()
+
+    useEffect(() => {
+        if (user) {
+            GamificationService.checkAchievements(user.id, streak)
+        }
+    }, [user, streak])
+
+    return (
+        <>
             <Routes>
                 <Route path="/login" element={!user ? <Login /> : <Navigate to="/dashboard" />} />
                 <Route path="/register" element={!user ? <Register /> : <Navigate to="/dashboard" />} />
@@ -95,7 +112,7 @@ function App() {
                     onAction={() => setInviteData(null)}
                 />
             )}
-        </Router>
+        </>
     )
 }
 

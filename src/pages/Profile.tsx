@@ -3,10 +3,12 @@ import { useNavigate } from "react-router-dom"
 import { useAuth } from "@/hooks/useAuth"
 import { CreditCard, User, Shield, ChevronRight, History, Trophy, Flame, Gift } from "lucide-react"
 import { supabase } from "@/lib/supabase"
+import { useStreak } from "@/contexts/StreakContext"
 
 export default function Profile() {
     const navigate = useNavigate()
-    const { user, streak } = useAuth()
+    const { user } = useAuth()
+    const { streak, hasInteractedToday } = useStreak()
     const [userLeague, setUserLeague] = useState('sprout')
     const [userXP, setUserXP] = useState<number>(0)
 
@@ -59,7 +61,7 @@ export default function Profile() {
                         {user?.user_metadata?.full_name?.charAt(0) || "U"}
                     </div>
                     <div className="absolute -bottom-2 -right-2 bg-white rounded-full p-1 shadow-md">
-                        <div className="bg-orange-100 text-orange-600 rounded-full px-2 py-1 flex items-center gap-1 text-xs font-bold border border-orange-200">
+                        <div className={`rounded-full px-2 py-1 flex items-center gap-1 text-xs font-bold border ${hasInteractedToday ? 'bg-orange-100 text-orange-600 border-orange-200' : 'bg-slate-50 text-slate-500 border-slate-200'}`}>
                             <Flame size={12} fill="currentColor" /> {streak}
                         </div>
                     </div>

@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import { GamificationService } from '@/services/gamification';
 import { useAuth } from '@/hooks/useAuth';
-
+import { useStreak } from '@/contexts/StreakContext';
 
 export interface Achievement {
-    id: string; 
+    id: string;
     name: string;
     description: string;
     icon_name: string;
@@ -16,7 +16,8 @@ export interface UserAchievement {
 }
 
 export const useAchievements = () => {
-    const { user, streak } = useAuth();
+    const { user } = useAuth();
+    const { streak } = useStreak();
     const [achievements, setAchievements] = useState<Achievement[]>([]);
     const [userAchievements, setUserAchievements] = useState<UserAchievement[]>([]);
     const [loading, setLoading] = useState(true);

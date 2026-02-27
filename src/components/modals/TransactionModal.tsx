@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils"
 import { TransactionService } from "@/services/transactions"
 import { toast } from "sonner"
 import { useAuth } from "@/hooks/useAuth"
+import { useStreak } from "@/contexts/StreakContext"
 import { CurrencyInput } from "@/components/ui/CurrencyInput"
 
 interface TransactionModalProps {
@@ -24,6 +25,7 @@ interface Category {
 
 export function TransactionModal({ isOpen, type, onClose, onSuccess, initialData }: TransactionModalProps) {
     const { user } = useAuth()
+    const { registerMeaningfulInteraction } = useStreak()
     const [amount, setAmount] = useState('')
     const [description, setDescription] = useState('')
     const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
@@ -108,6 +110,7 @@ export function TransactionModal({ isOpen, type, onClose, onSuccess, initialData
                 toast.success(isIncome ? "Receita adicionada com sucesso!" : "Despesa adicionada com sucesso!")
             }
 
+            registerMeaningfulInteraction()
             window.dispatchEvent(new CustomEvent('transaction_updated'))
             onSuccess()
             onClose()

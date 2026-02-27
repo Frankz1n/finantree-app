@@ -7,9 +7,11 @@ import { Button } from "@/components/ui/button"
 import { useNavigate } from "react-router-dom"
 import { toast } from "sonner"
 import { GamificationService } from "@/services/gamification"
+import { useStreak } from "@/contexts/StreakContext"
 
 export default function Subscriptions() {
     const navigate = useNavigate()
+    const { registerMeaningfulInteraction } = useStreak()
     const [expandedId, setExpandedId] = useState<string | null>(null)
     const [subscriptions, setSubscriptions] = useState(mockSubscriptions)
     const [showTip, setShowTip] = useState(false)
@@ -40,6 +42,7 @@ export default function Subscriptions() {
 
             // Trigger Gamification
             GamificationService.triggerConfetti()
+            registerMeaningfulInteraction()
             toast.success(
                 <div className="flex flex-col gap-1">
                     <span className="font-bold">🎉 Ótima decisão!</span>
