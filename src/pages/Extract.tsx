@@ -150,26 +150,26 @@ export default function Extract() {
                         />
                     </div>
 
-                    <div className="flex gap-2 w-full lg:w-auto">
+                    <div className="grid grid-cols-2 lg:flex lg:flex-row gap-2 w-full lg:w-auto">
                         <Button
                             onClick={() => navigate('/parcelamentos')}
                             variant="outline"
-                            className="rounded-full border-slate-200 text-slate-900 hover:bg-slate-50 w-full lg:w-auto"
+                            className="rounded-full border-slate-200 text-slate-900 hover:bg-slate-50 w-full text-xs sm:text-sm px-2 cursor-pointer"
                         >
-                            <ShoppingBag size={18} className="mr-2" /> Parceladas
+                            <ShoppingBag size={16} className="mr-1 sm:mr-2" /> Parceladas
                         </Button>
                         <Button
                             onClick={() => navigate('/assinaturas')}
                             variant="outline"
-                            className="rounded-full border-slate-200 text-slate-900 hover:bg-slate-50 w-full lg:w-auto"
+                            className="rounded-full border-slate-200 text-slate-900 hover:bg-slate-50 w-full text-xs sm:text-sm px-2 cursor-pointer"
                         >
-                            <Repeat size={18} className="mr-2" /> Assinaturas
+                            <Repeat size={16} className="mr-1 sm:mr-2" /> Assinaturas
                         </Button>
                         <Button
                             onClick={() => setIsAddModalOpen(true)}
-                            className="rounded-full bg-slate-900 text-white hover:bg-slate-800 w-full lg:w-auto"
+                            className="col-span-2 lg:col-span-1 rounded-full bg-slate-900 text-white hover:bg-slate-800 w-full cursor-pointer"
                         >
-                            <Plus size={18} className="mr-2" /> Novo
+                            <Plus size={18} className="mr-2" /> Nova Transação
                         </Button>
                     </div>
                 </div>
@@ -182,10 +182,10 @@ export default function Extract() {
             <div className="space-y-4">
 
                 { }
-                <div className="flex flex-col lg:flex-row gap-4 justify-between items-start lg:items-center">
+                <div className="flex flex-col lg:flex-row gap-4 justify-between items-start lg:items-center w-full">
 
                     { }
-                    <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+                    <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide w-full lg:w-auto">
                         {['Todos', 'Entradas', 'Saídas', 'Investimentos'].map((typeLabel) => {
                             const typeMap: Record<string, string> = {
                                 'Todos': 'all',
@@ -200,7 +200,7 @@ export default function Extract() {
                                 <button
                                     key={typeLabel}
                                     onClick={() => handleTypeFilter(typeValue)}
-                                    className={`rounded-full px-4 py-2 text-xs font-bold transition-all whitespace-nowrap border ${isActive
+                                    className={`rounded-full px-4 py-2 text-xs font-bold transition-all whitespace-nowrap border cursor-pointer ${isActive
                                         ? 'bg-slate-900 text-white border-slate-900'
                                         : 'bg-white text-slate-500 border-slate-200 hover:bg-slate-50'
                                         }`}
@@ -212,23 +212,23 @@ export default function Extract() {
                     </div>
 
                     { }
-                    <div className="flex w-full md:w-auto items-center gap-2 bg-white p-1 rounded-full border border-slate-200 shadow-sm">
-                        <div className="relative flex-1">
-                            <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={14} />
+                    <div className="flex w-full lg:w-auto items-center gap-1 sm:gap-2 bg-white p-1 rounded-full border border-slate-200 shadow-sm overflow-hidden">
+                        <div className="relative flex-1 flex items-center min-w-0">
+                            <Calendar className="absolute left-2 sm:left-3 top-1/2 -translate-y-1/2 text-slate-400" size={14} />
                             <input
                                 type="date"
                                 value={startDate}
                                 onChange={(e) => handleDateChange('startDate', e.target.value)}
-                                className="h-9 w-full md:w-32 rounded-full border-none bg-transparent pl-9 text-xs font-bold text-slate-600 outline-none focus:ring-0 cursor-pointer"
+                                className="h-9 w-full rounded-full border-none bg-transparent pl-7 sm:pl-9 pr-1 text-[10px] sm:text-[11px] md:text-xs font-bold text-slate-600 outline-none focus:ring-0 cursor-pointer"
                             />
                         </div>
-                        <span className="text-slate-300">|</span>
-                        <div className="relative flex-1">
+                        <span className="text-slate-300 shrink-0">|</span>
+                        <div className="relative flex-1 flex items-center min-w-0">
                             <input
                                 type="date"
                                 value={endDate}
                                 onChange={(e) => handleDateChange('endDate', e.target.value)}
-                                className="h-9 w-full md:w-32 rounded-full border-none bg-transparent px-2 text-xs font-bold text-slate-600 outline-none focus:ring-0 cursor-pointer"
+                                className="h-9 w-full rounded-full border-none bg-transparent px-1 sm:px-2 text-[10px] sm:text-[11px] md:text-xs font-bold text-slate-600 outline-none focus:ring-0 cursor-pointer"
                             />
                         </div>
                     </div>

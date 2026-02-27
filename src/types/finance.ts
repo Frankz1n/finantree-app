@@ -117,3 +117,28 @@ export interface LeagueRanking {
     xp: number
     position: number
 }
+
+export interface Subscription {
+    id: string
+    user_id: string
+    name: string
+    amount: number
+    category: string
+    status: 'active' | 'paused' | 'canceled'
+    billing_cycle: 'monthly' | 'yearly'
+    domain: string | null
+    start_date: string
+    created_at: string
+}
+
+export interface Installment {
+    id: string
+    user_id: string
+    name: string
+    bank: string
+    amount: number
+    total_installments: number
+    current_installment: number
+    start_date: string
+    created_at: string
+}

@@ -74,40 +74,7 @@ export default function Garden() {
 
             if (error) throw error
 
-            // --- INÍCIO MOCK DE GAMIFICAÇÃO NEGATIVA ---
-            const mockedData = data || [];
-
-            // Check se o usuário já tem uma meta teste de Málaga, se não, não precisa mockar se já existir.
-            // Para simplicidade, vamos verificar se as goals dele estão vazias ou não, e forçar a injeção ou sobreposição da primeira para testes.
-            if (mockedData.length > 0) {
-                // Modifica a primeira para testes se não tiver o status 'delayed' já ativo em outra.
-                if (!mockedData.some(b => b.status === 'delayed')) {
-                    mockedData[0] = {
-                        ...mockedData[0],
-                        name: "Mudança para Málaga (Mock)",
-                        status: 'delayed',
-                        monthly_target: 350,
-                        current_amount: mockedData[0].current_amount || 0,
-                    };
-                }
-            } else {
-                // Criação ficticia se o utilizador for novo
-                mockedData.push({
-                    id: 'mock-malaga-id',
-                    user_id: user.id,
-                    name: "Mudança para Málaga",
-                    target_amount: 15000,
-                    current_amount: 2500,
-                    icon: "✈️",
-                    color: "#F59E0B", // amber
-                    created_at: new Date().toISOString(),
-                    status: 'delayed',
-                    monthly_target: 500
-                })
-            }
-            // --- FIM MOCK ---
-
-            setSavingBoxes(mockedData)
+            setSavingBoxes(data || [])
 
             // Trigger Oracle Toast se houver metas em atraso
             if (mockedData.some(b => b.status === 'delayed')) {

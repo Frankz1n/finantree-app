@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react"
-import { mockSubscriptions } from "@/mocks/subscriptions"
 import { formatCurrency } from "@/lib/utils"
 import { ChevronDown, ChevronUp, Repeat, CreditCard, ArrowLeft, Sparkles, X } from "lucide-react"
 import { Card } from "@/components/ui/card"
@@ -8,48 +7,75 @@ import { useNavigate } from "react-router-dom"
 import { toast } from "sonner"
 import { GamificationService } from "@/services/gamification"
 import { useStreak } from "@/contexts/StreakContext"
+import { SubscriptionService } from "@/services/subscriptions"
+import { Subscription } from "@/types/finance"
+import { useAuth } from "@/hooks/useAuth"
 
 export default function Subscriptions() {
     const navigate = useNavigate()
+    const { user } = useAuth()
     const { registerMeaningfulInteraction } = useStreak()
     const [expandedId, setExpandedId] = useState<string | null>(null)
-    const [subscriptions, setSubscriptions] = useState(mockSubscriptions)
+    const [subscriptions, setSubscriptions] = useState<Subscription[]>([])
+    const [isLoading, setIsLoading] = useState(true)
     const [showTip, setShowTip] = useState(false)
     const [isTipDismissed, setIsTipDismissed] = useState(false)
 
     useEffect(() => {
-        if (isTipDismissed) return;
+        if (!user) return;
+
+        const fetchSubscriptions = async () => {
+            setIsLoading(true);
+            try {
+                const data = await SubscriptionService.getUserSubscriptions(user.id);
+                setSubscriptions(data);
+            } catch (error) {
+                console.error("Error fetching subscriptions", error);
+                toast.error("Erro ao carregar assinaturas.");
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchSubscriptions();
+    }, [user]);
+
+    useEffect(() => {
+        if (isTipDismissed || isLoading) return;
 
         const timer = setTimeout(() => {
-            const hasStreaming = subscriptions.some(s => s.category === 'Streaming');
+            const hasStreaming = subscriptions.some(s => s.category.toLowerCase() === 'streaming' && s.status === 'active');
             if (hasStreaming) {
-                setShowTip(true)
+                setShowTip(true);
             }
-        }, 1500)
+        }, 1500);
 
-        return () => clearTimeout(timer)
-    }, [isTipDismissed, subscriptions])
+        return () => clearTimeout(timer);
+    }, [isTipDismissed, subscriptions, isLoading]);
 
-    const handleAcceptTip = () => {
-        // Find a streaming subscription to "cancel" (e.g. Netflix)
-        const subToCancel = subscriptions.find(s => s.category === 'Streaming')
+    const handleAcceptTip = async () => {
+        const subToCancel = subscriptions.find(s => s.category.toLowerCase() === 'streaming' && s.status === 'active')
 
         if (subToCancel) {
-            // Remove it from the list visually
-            setSubscriptions(prev => prev.filter(s => s.id !== subToCancel.id))
-            setShowTip(false)
-            setIsTipDismissed(true)
+            try {
+                await SubscriptionService.updateSubscriptionStatus(subToCancel.id, 'canceled');
 
-            // Trigger Gamification
-            GamificationService.triggerConfetti()
-            registerMeaningfulInteraction()
-            toast.success(
-                <div className="flex flex-col gap-1">
-                    <span className="font-bold">🎉 Ótima decisão!</span>
-                    <span>Você ganhou <strong className="text-emerald-400">+50 XP do Oráculo</strong> e ajudou a sua Árvore a crescer!</span>
-                </div>,
-                { duration: 5000 }
-            )
+                setSubscriptions(prev => prev.map(s => s.id === subToCancel.id ? { ...s, status: 'canceled' } : s))
+                setShowTip(false)
+                setIsTipDismissed(true)
+
+                GamificationService.triggerConfetti()
+                registerMeaningfulInteraction()
+                toast.success(
+                    <div className="flex flex-col gap-1">
+                        <span className="font-bold">🎉 Ótima decisão!</span>
+                        <span>Você ganhou <strong className="text-emerald-400">+50 XP do Oráculo</strong> e ajudou a sua Árvore a crescer!</span>
+                    </div>,
+                    { duration: 5000 }
+                )
+            } catch (error) {
+                toast.error("Erro ao cancelar assinatura. Tente novamente.");
+            }
         }
     }
 
@@ -57,7 +83,7 @@ export default function Subscriptions() {
         setExpandedId(expandedId === id ? null : id)
     }
 
-    const totalRecurring = subscriptions.reduce((acc, sub) => acc + sub.amount, 0)
+    const totalRecurring = subscriptions.filter(s => s.status === 'active').reduce((acc, sub) => acc + sub.amount, 0)
 
     const getStatusColor = (status: string) => {
         switch (status) {
@@ -158,104 +184,114 @@ export default function Subscriptions() {
                 </div>
             )}
 
-            <div className="space-y-4">
-                <h3 className="text-lg font-bold text-slate-900 px-2">Suas Assinaturas</h3>
-                <div className="grid gap-4">
-                    {subscriptions.map((sub) => {
-                        const isExpanded = expandedId === sub.id
-                        const totalSpent = sub.paymentHistory.reduce((acc, p) => acc + p.amount, 0)
+            {isLoading ? (
+                <div className="flex flex-col gap-4">
+                    <div className="h-6 w-48 bg-slate-200 animate-pulse rounded-full px-2"></div>
+                    {[1, 2, 3].map((skeleton) => (
+                        <div key={skeleton} className="h-24 w-full rounded-[24px] bg-white border border-slate-100 shadow-sm animate-pulse"></div>
+                    ))}
+                </div>
+            ) : (
+                <div className="space-y-4">
+                    <h3 className="text-lg font-bold text-slate-900 px-2">Suas Assinaturas</h3>
+                    {subscriptions.length === 0 ? (
+                        <div className="text-center py-12 px-4 rounded-[24px] bg-slate-50 border border-slate-100 border-dashed">
+                            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-white shadow-sm mx-auto mb-4">
+                                <Repeat size={32} className="text-slate-300" />
+                            </div>
+                            <h3 className="text-lg font-bold text-slate-900 mb-2">Nenhuma Assinatura</h3>
+                            <p className="text-slate-500 font-medium max-w-sm mx-auto">
+                                Você não possui assinaturas ativas monitoradas no banco de dados.
+                            </p>
+                        </div>
+                    ) : (
+                        <div className="grid gap-4">
+                            {subscriptions.map((sub) => {
+                                const isExpanded = expandedId === sub.id
+                                // For the sake of the UX simulation we will generate an artificial spent amount for now until we have real billing integrations
+                                const totalSpent = sub.amount * 12;
 
-                        return (
-                            <Card
-                                key={sub.id}
-                                className="overflow-hidden rounded-[24px] border border-slate-100 bg-white shadow-sm transition-all hover:shadow-md"
-                            >
-                                <div
-                                    className="flex items-center justify-between p-4 cursor-pointer"
-                                    onClick={() => toggleExpand(sub.id)}
-                                >
-                                    <div className="flex items-center gap-4">
-                                        <div className="h-12 w-12 overflow-hidden rounded-full bg-slate-100 flex items-center justify-center shrink-0 border border-slate-200">
-                                            <img
-                                                src={`https://logo.clearbit.com/${sub.domain}`}
-                                                alt={`${sub.name} logo`}
-                                                className="h-full w-full object-cover"
-                                                onError={(e) => {
-                                                    const target = e.target as HTMLImageElement;
-                                                    target.style.display = 'none';
-                                                    target.nextElementSibling?.classList.remove('hidden');
-                                                }}
-                                            />
-                                            <span className="hidden text-xl font-bold text-slate-500">
-                                                {sub.name.charAt(0)}
-                                            </span>
-                                        </div>
-                                        <div>
-                                            <h4 className="font-bold text-slate-900">{sub.name}</h4>
-                                            <div className="flex items-center gap-2 mt-1">
-                                                <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold border ${getStatusColor(sub.status)}`}>
-                                                    {getStatusText(sub.status)}
-                                                </span>
-                                                <span className="text-[10px] font-bold text-slate-400 uppercase">
-                                                    {sub.category}
-                                                </span>
+                                return (
+                                    <Card
+                                        key={sub.id}
+                                        className="overflow-hidden rounded-[24px] border border-slate-100 bg-white shadow-sm transition-all hover:shadow-md"
+                                    >
+                                        <div
+                                            className="flex items-center justify-between p-4 cursor-pointer"
+                                            onClick={() => toggleExpand(sub.id)}
+                                        >
+                                            <div className="flex items-center gap-4">
+                                                <div className="h-12 w-12 overflow-hidden rounded-full bg-slate-100 flex items-center justify-center shrink-0 border border-slate-200">
+                                                    <img
+                                                        src={`https://logo.clearbit.com/${sub.domain}`}
+                                                        alt={`${sub.name} logo`}
+                                                        className="h-full w-full object-cover"
+                                                        onError={(e) => {
+                                                            const target = e.target as HTMLImageElement;
+                                                            target.style.display = 'none';
+                                                            target.nextElementSibling?.classList.remove('hidden');
+                                                        }}
+                                                    />
+                                                    <span className="hidden text-xl font-bold text-slate-500">
+                                                        {sub.name.charAt(0)}
+                                                    </span>
+                                                </div>
+                                                <div>
+                                                    <h4 className="font-bold text-slate-900">{sub.name}</h4>
+                                                    <div className="flex items-center gap-2 mt-1">
+                                                        <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold border ${getStatusColor(sub.status)}`}>
+                                                            {getStatusText(sub.status)}
+                                                        </span>
+                                                        <span className="text-[10px] font-bold text-slate-400 uppercase">
+                                                            {sub.category}
+                                                        </span>
+                                                    </div>
+                                                </div>
                                             </div>
-                                        </div>
-                                    </div>
 
-                                    <div className="flex items-center gap-4">
-                                        <div className="text-right">
-                                            <div className="font-bold text-slate-900">{formatCurrency(sub.amount)}</div>
-                                            <div className="text-[10px] font-bold text-slate-400 uppercase">/ {sub.billingCycle === 'monthly' ? 'mês' : 'ano'}</div>
-                                        </div>
-                                        <div className="text-slate-400">
-                                            {isExpanded ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
-                                        </div>
-                                    </div>
-                                </div>
-
-                                {isExpanded && (
-                                    <div className="border-t border-slate-100 bg-slate-50 p-4 animate-in slide-in-from-top-2 duration-200">
-                                        <div className="grid grid-cols-2 gap-4 mb-4">
-                                            <div className="bg-white p-3 rounded-2xl border border-slate-100 shadow-sm">
-                                                <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Total Gasto</div>
-                                                <div className="text-lg font-bold text-slate-900">{formatCurrency(totalSpent)}</div>
-                                            </div>
-                                            <div className="bg-white p-3 rounded-2xl border border-slate-100 shadow-sm">
-                                                <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Cliente Desde</div>
-                                                <div className="text-sm font-bold text-slate-900 mt-1">
-                                                    {new Date(sub.startDate).toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })}
+                                            <div className="flex items-center gap-4">
+                                                <div className="text-right">
+                                                    <div className="font-bold text-slate-900">{formatCurrency(sub.amount)}</div>
+                                                    <div className="text-[10px] font-bold text-slate-400 uppercase">/ {sub.billing_cycle === 'monthly' ? 'mês' : 'ano'}</div>
+                                                </div>
+                                                <div className="text-slate-400">
+                                                    {isExpanded ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
                                                 </div>
                                             </div>
                                         </div>
 
-                                        <div>
-                                            <h5 className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-2 flex items-center gap-2">
-                                                <CreditCard size={14} /> Histórico de Pagamentos (Simulado)
-                                            </h5>
-                                            <div className="space-y-2">
-                                                {sub.paymentHistory.map((payment) => (
-                                                    <div key={payment.id} className="flex justify-between items-center text-sm p-3 bg-white rounded-xl border border-slate-100 shadow-sm">
-                                                        <span className="font-bold text-slate-600">
-                                                            {new Date(payment.date).toLocaleDateString('pt-BR')}
-                                                        </span>
-                                                        <div className="flex items-center gap-2">
-                                                            <span className="font-bold text-slate-900">{formatCurrency(payment.amount)}</span>
-                                                            {payment.status === 'paid' && (
-                                                                <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
-                                                            )}
+                                        {isExpanded && (
+                                            <div className="border-t border-slate-100 bg-slate-50 p-4 animate-in slide-in-from-top-2 duration-200">
+                                                <div className="grid grid-cols-2 gap-4 mb-4">
+                                                    <div className="bg-white p-3 rounded-2xl border border-slate-100 shadow-sm">
+                                                        <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Total Estimado</div>
+                                                        <div className="text-lg font-bold text-slate-900">{formatCurrency(totalSpent)}</div>
+                                                    </div>
+                                                    <div className="bg-white p-3 rounded-2xl border border-slate-100 shadow-sm">
+                                                        <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Cliente Desde</div>
+                                                        <div className="text-sm font-bold text-slate-900 mt-1">
+                                                            {new Date(sub.start_date).toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })}
                                                         </div>
                                                     </div>
-                                                ))}
+                                                </div>
+
+                                                <div>
+                                                    <h5 className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-2 flex items-center gap-2">
+                                                        <CreditCard size={14} /> Histórico de Pagamentos (Exemplo)
+                                                    </h5>
+                                                    <div className="space-y-2 text-sm text-center text-slate-400 py-4">
+                                                        Conexão com Open Finance necessária para importar o extrato histórico específico desta assinatura.
+                                                    </div>
+                                                </div>
                                             </div>
-                                        </div>
-                                    </div>
-                                )}
-                            </Card>
-                        )
-                    })}
+                                        )}
+                                    </Card>
+                                )
+                            })}
+                        </div>
+                    )}
                 </div>
-            </div>
+            )}
         </div>
     )
 }

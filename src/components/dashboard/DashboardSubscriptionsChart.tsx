@@ -1,15 +1,39 @@
-import { useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Card } from '@/components/ui/card';
 import { PieChart, Pie, Cell, Legend, Tooltip as RechartsTooltip, ResponsiveContainer } from 'recharts';
-import { mockSubscriptions } from '@/mocks/subscriptions';
 import { formatCurrency } from '@/lib/utils';
 import { Repeat } from 'lucide-react';
+import { SubscriptionService } from '@/services/subscriptions';
+import { useAuth } from '@/hooks/useAuth';
+import { Subscription } from '@/types/finance';
 
 const COLORS = ['#8b5cf6', '#3b82f6', '#10b981', '#f59e0b', '#ef4444'];
 
 export function DashboardSubscriptionsChart() {
+    const { user } = useAuth();
+    const [subscriptions, setSubscriptions] = useState<Subscription[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+
+    useEffect(() => {
+        if (!user) return;
+
+        const fetchSubscriptions = async () => {
+            setIsLoading(true);
+            try {
+                const data = await SubscriptionService.getUserSubscriptions(user.id);
+                setSubscriptions(data);
+            } catch (error) {
+                console.error("Error fetching subscriptions", error);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchSubscriptions();
+    }, [user]);
+
     const chartData = useMemo(() => {
-        const activeSubscriptions = mockSubscriptions.filter(s => s.status === 'active');
+        const activeSubscriptions = subscriptions.filter(s => s.status === 'active');
 
         const categoryTotals = activeSubscriptions.reduce((acc: Record<string, number>, curr) => {
             acc[curr.category] = (acc[curr.category] || 0) + curr.amount;
@@ -23,7 +47,7 @@ export function DashboardSubscriptionsChart() {
                 color: COLORS[index % COLORS.length]
             }))
             .sort((a, b) => b.value - a.value);
-    }, []);
+    }, [subscriptions]);
 
     const PieTooltip = ({ active, payload }: any) => {
         if (active && payload && payload.length) {
@@ -47,14 +71,18 @@ export function DashboardSubscriptionsChart() {
             </h3>
 
             <div className="w-full flex items-center justify-center h-[300px]">
-                {chartData.length === 0 ? (
+                {isLoading ? (
+                    <div className="flex flex-col items-center justify-center text-slate-400 gap-3 text-center">
+                        <div className="h-40 w-40 rounded-full border-4 border-slate-100 border-t-slate-300 animate-spin"></div>
+                    </div>
+                ) : chartData.length === 0 ? (
                     <div className="flex flex-col items-center justify-center text-slate-400 gap-3 text-center">
                         <div className="h-16 w-16 rounded-full bg-slate-50 flex items-center justify-center text-2xl">
                             🔄
                         </div>
                         <div>
                             <p className="text-sm font-bold text-slate-500">Nenhuma assinatura.</p>
-                            <p className="text-[10px] text-slate-400 mt-1 uppercase tracking-wider">Simulação Open Finance</p>
+                            <p className="text-[10px] text-slate-400 mt-1 uppercase tracking-wider">Aguardando dados</p>
                         </div>
                     </div>
                 ) : (
