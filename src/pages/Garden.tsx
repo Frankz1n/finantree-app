@@ -77,7 +77,7 @@ export default function Garden() {
             setSavingBoxes(data || [])
 
             // Trigger Oracle Toast se houver metas em atraso
-            if (mockedData.some(b => b.status === 'delayed')) {
+            if (data.some(b => b.status === 'delayed')) {
                 setTimeout(() => setShowOracleToast(true), 1200);
             }
         } catch (error) {
