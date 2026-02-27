@@ -96,6 +96,8 @@ export interface SavingBox {
     icon: string
     color: string
     created_at: string
+    status?: 'on_track' | 'delayed'
+    monthly_target?: number
 }
 
 export interface SavingBoxTransaction {

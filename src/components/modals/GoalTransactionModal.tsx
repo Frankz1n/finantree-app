@@ -13,19 +13,20 @@ interface GoalTransactionModalProps {
     boxId: string
     type: 'deposit' | 'withdrawal'
     currentAmount: number
+    initialAmount?: number
 }
 
-export function GoalTransactionModal({ isOpen, onClose, onSuccess, boxId, type, currentAmount }: GoalTransactionModalProps) {
+export function GoalTransactionModal({ isOpen, onClose, onSuccess, boxId, type, currentAmount, initialAmount }: GoalTransactionModalProps) {
     const { user } = useAuth()
     const [amount, setAmount] = useState('')
     const [isSubmitting, setIsSubmitting] = useState(false)
 
     useEffect(() => {
         if (isOpen) {
-            setAmount('')
+            setAmount(initialAmount ? initialAmount.toString() : '')
             setIsSubmitting(false)
         }
-    }, [isOpen])
+    }, [isOpen, initialAmount])
 
     const isDeposit = type === 'deposit'
 

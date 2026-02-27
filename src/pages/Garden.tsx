@@ -6,13 +6,14 @@ import { GardenOnboardingModal } from "@/components/modals/GardenOnboardingModal
 import { GoalModal } from "@/components/modals/GoalModal"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Plus, Sprout, MoreVertical, Edit2, Trash2 } from "lucide-react"
-import { formatCurrency } from "@/lib/utils"
-import { motion } from "framer-motion"
+import { Plus, Sprout, MoreVertical, Edit2, Trash2, Droplets, Sparkles, X, Leaf } from "lucide-react"
+import { formatCurrency, cn } from "@/lib/utils"
+import { motion, AnimatePresence } from "framer-motion"
 import { useNavigate } from "react-router-dom"
 import { SavingBoxService } from "@/services/savingBoxes"
 import { toast } from "sonner"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { GoalTransactionModal } from "@/components/modals/GoalTransactionModal"
 
 export default function Garden() {
     const { user } = useAuth()
@@ -22,7 +23,16 @@ export default function Garden() {
     const [isLoading, setIsLoading] = useState(true)
     const [showOnboarding, setShowOnboarding] = useState(false)
     const [showGoalModal, setShowGoalModal] = useState(false)
-    // const [editingBox, setEditingBox] = useState<SavingBox | null>(null) // Placeholder para futura edição
+    const [showOracleToast, setShowOracleToast] = useState(false)
+
+    // Transaction Modal State
+    const [transactionModalConfig, setTransactionModalConfig] = useState<{
+        isOpen: boolean;
+        boxId: string;
+        type: 'deposit' | 'withdrawal';
+        currentAmount: number;
+        initialAmount?: number;
+    }>({ isOpen: false, boxId: '', type: 'deposit', currentAmount: 0 })
 
     useEffect(() => {
         if (user) {
@@ -63,7 +73,46 @@ export default function Garden() {
                 .order('created_at', { ascending: false })
 
             if (error) throw error
-            setSavingBoxes(data || [])
+
+            // --- INÍCIO MOCK DE GAMIFICAÇÃO NEGATIVA ---
+            const mockedData = data || [];
+
+            // Check se o usuário já tem uma meta teste de Málaga, se não, não precisa mockar se já existir.
+            // Para simplicidade, vamos verificar se as goals dele estão vazias ou não, e forçar a injeção ou sobreposição da primeira para testes.
+            if (mockedData.length > 0) {
+                // Modifica a primeira para testes se não tiver o status 'delayed' já ativo em outra.
+                if (!mockedData.some(b => b.status === 'delayed')) {
+                    mockedData[0] = {
+                        ...mockedData[0],
+                        name: "Mudança para Málaga (Mock)",
+                        status: 'delayed',
+                        monthly_target: 350,
+                        current_amount: mockedData[0].current_amount || 0,
+                    };
+                }
+            } else {
+                // Criação ficticia se o utilizador for novo
+                mockedData.push({
+                    id: 'mock-malaga-id',
+                    user_id: user.id,
+                    name: "Mudança para Málaga",
+                    target_amount: 15000,
+                    current_amount: 2500,
+                    icon: "✈️",
+                    color: "#F59E0B", // amber
+                    created_at: new Date().toISOString(),
+                    status: 'delayed',
+                    monthly_target: 500
+                })
+            }
+            // --- FIM MOCK ---
+
+            setSavingBoxes(mockedData)
+
+            // Trigger Oracle Toast se houver metas em atraso
+            if (mockedData.some(b => b.status === 'delayed')) {
+                setTimeout(() => setShowOracleToast(true), 1200);
+            }
         } catch (error) {
             console.error("Error loading saving boxes:", error)
         } finally {
@@ -125,9 +174,48 @@ export default function Garden() {
                 </Button>
             </header>
 
+            {/* O Oráculo Tip - Aviso Gamificado Restrito */}
+            <AnimatePresence>
+                {showOracleToast && (
+                    <motion.div
+                        initial={{ opacity: 0, y: -20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, scale: 0.95 }}
+                        className="relative overflow-hidden rounded-[24px] bg-gradient-to-r from-amber-500 to-orange-600 p-5 shadow-lg shadow-orange-500/30 text-white"
+                    >
+                        <div className="absolute top-0 right-0 p-4 opacity-10 pointer-events-none">
+                            <Sparkles size={64} />
+                        </div>
+
+                        <div className="relative z-10 flex gap-4 pr-6">
+                            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-white/20 shadow-inner backdrop-blur-md">
+                                <Sparkles size={24} className="text-white" />
+                            </div>
+                            <div className="flex-1 space-y-1 text-left">
+                                <h3 className="font-bold text-lg flex items-center gap-2">
+                                    Oráculo <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-white/20 uppercase tracking-wider">Atenção</span>
+                                </h3>
+                                <p className="text-orange-100 text-sm leading-relaxed">
+                                    O seu jardim está a secar! Se você não regar (depositar) este mês, a sua meta vai atrasar em 2 meses. <strong className="font-bold text-white">Pegue o regador</strong> ao lado da sua planta e recupere o ritmo!
+                                </p>
+                            </div>
+                        </div>
+
+                        <button
+                            onClick={() => setShowOracleToast(false)}
+                            className="absolute top-4 right-4 text-orange-200 hover:text-white transition-colors bg-white/10 rounded-full p-1"
+                        >
+                            <X size={16} />
+                        </button>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 {savingBoxes.map((box, index) => {
                     const progress = calculateProgress(box.current_amount, box.target_amount)
+                    const isDelayed = box.status === 'delayed'
+
                     return (
                         <motion.div
                             key={box.id}
@@ -137,7 +225,10 @@ export default function Garden() {
                         >
                             <Card
                                 onClick={() => navigate(`/jardim/${box.id}`)}
-                                className="group relative overflow-hidden rounded-[32px] border-none bg-white p-6 shadow-sm hover:shadow-md transition-all duration-300 cursor-pointer"
+                                className={cn(
+                                    "group relative overflow-hidden rounded-[32px] border bg-white p-6 shadow-sm hover:shadow-md transition-all duration-300 cursor-pointer",
+                                    isDelayed ? "border-orange-200 bg-orange-50/30" : "border-slate-100"
+                                )}
                             >
                                 <div className="absolute top-4 right-4 z-10" onClick={(e) => e.stopPropagation()}>
                                     <DropdownMenu>
@@ -146,16 +237,16 @@ export default function Garden() {
                                                 <MoreVertical size={16} />
                                             </Button>
                                         </DropdownMenuTrigger>
-                                        <DropdownMenuContent align="end" className="w-40 rounded-xl shadow-lg border-slate-100">
+                                        <DropdownMenuContent align="end" className="w-40 rounded-xl shadow-lg border-slate-100 p-1">
                                             <DropdownMenuItem
                                                 onClick={(e) => { e.stopPropagation(); toast.info("Edição virá em breve!") }}
-                                                className="flex items-center gap-2 cursor-pointer font-medium"
+                                                className="flex items-center gap-2 cursor-pointer font-medium rounded-lg"
                                             >
                                                 <Edit2 size={14} /> Editar
                                             </DropdownMenuItem>
                                             <DropdownMenuItem
                                                 onClick={(e) => handleDelete(e, box.id)}
-                                                className="flex items-center gap-2 cursor-pointer text-rose-600 focus:text-rose-600 font-medium"
+                                                className="flex items-center gap-2 cursor-pointer text-rose-600 focus:text-rose-600 focus:bg-rose-50 font-medium rounded-lg"
                                             >
                                                 <Trash2 size={14} /> Deletar
                                             </DropdownMenuItem>
@@ -163,11 +254,34 @@ export default function Garden() {
                                     </DropdownMenu>
                                 </div>
 
-                                <div className="flex justify-between items-start mb-8 pt-2">
-                                    <div className="h-12 w-12 rounded-full bg-orange-50 flex items-center justify-center text-xl font-bold text-orange-500">
-                                        {box.icon || getInitials(box.name)}
+                                <div className="flex justify-between items-start mb-8 pt-2 relative">
+                                    <div className={cn("h-12 w-12 rounded-full flex items-center justify-center text-xl font-bold shadow-sm", isDelayed ? "bg-orange-100 text-orange-600" : "bg-emerald-50 text-emerald-600")}>
+                                        {isDelayed ? <Leaf size={24} className="opacity-70" /> : (box.icon || getInitials(box.name))}
                                     </div>
-                                    <div className="bg-slate-50 px-3 py-1 rounded-full text-xs font-bold text-slate-500 mr-8">
+
+                                    {isDelayed && (
+                                        <div
+                                            className="absolute -top-1 left-9 z-20 cursor-pointer animate-pulse"
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                setTransactionModalConfig({
+                                                    isOpen: true,
+                                                    boxId: box.id,
+                                                    type: 'deposit',
+                                                    currentAmount: box.current_amount,
+                                                    initialAmount: box.monthly_target || 0
+                                                });
+                                                setShowOracleToast(false);
+                                            }}
+                                            title="Regar planta (Depositar meta mensal)"
+                                        >
+                                            <div className="bg-sky-500 text-white rounded-full p-1.5 shadow-md flex items-center justify-center hover:bg-sky-400 transition-colors">
+                                                <Droplets size={16} fill="currentColor" />
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    <div className={cn("px-3 py-1 rounded-full text-xs font-bold mr-8", isDelayed ? "bg-orange-100 text-orange-700" : "bg-slate-50 text-slate-500")}>
                                         {progress}%
                                     </div>
                                 </div>
@@ -177,11 +291,14 @@ export default function Garden() {
                                     <p className="text-xs font-medium text-slate-400">
                                         <span className="text-slate-600">{formatCurrency(box.current_amount)}</span> / {formatCurrency(box.target_amount)}
                                     </p>
+                                    {isDelayed && (
+                                        <p className="text-[10px] font-bold text-orange-500 mt-2">⚠️ Necessita ser regada este mês.</p>
+                                    )}
                                 </div>
 
-                                <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
+                                <div className={cn("h-2 w-full rounded-full overflow-hidden", isDelayed ? "bg-orange-200" : "bg-slate-100")}>
                                     <div
-                                        className="h-full bg-emerald-500 rounded-full transition-all duration-1000 ease-out"
+                                        className={cn("h-full rounded-full transition-all duration-1000 ease-out", isDelayed ? "bg-orange-500" : "bg-emerald-500")}
                                         style={{ width: `${progress}%` }}
                                     />
                                 </div>
@@ -214,6 +331,16 @@ export default function Garden() {
                 isOpen={showGoalModal}
                 onClose={() => setShowGoalModal(false)}
                 onSuccess={() => { loadSavingBoxes() }}
+            />
+
+            <GoalTransactionModal
+                isOpen={transactionModalConfig.isOpen}
+                onClose={() => setTransactionModalConfig(prev => ({ ...prev, isOpen: false }))}
+                onSuccess={() => { loadSavingBoxes() }}
+                boxId={transactionModalConfig.boxId}
+                type={transactionModalConfig.type}
+                currentAmount={transactionModalConfig.currentAmount}
+                initialAmount={transactionModalConfig.initialAmount}
             />
         </div>
     )
